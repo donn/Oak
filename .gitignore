@@ -1,0 +1,13 @@
+## IDE files (Regenerate Xcode Project if Needed)
+.vscode/
+*.xcodeproj/*
+.idea/
+CMakeLists.txt
+
+## Build
+cmake-build-debug/
+.build/
+build/
+DerivedData/
+Packages/
+Package.pins

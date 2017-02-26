@@ -101,12 +101,14 @@ let command = Command(
 
         if lexed.errorMessages.count != 0 {
             lexed.errorMessages.print()
+            return
         }
 
         let assembled = assembler.assemble(lexed.lines, labels: lexed.labels)
 
         if assembled.errorMessages.count != 0 {
             assembled.errorMessages.print()
+            return
         }
 
         machineCode = assembled.machineCode
@@ -131,6 +133,7 @@ let command = Command(
         catch
         {
             print("Error while loading program: \(error).")
+            return
         }
 
         while true
@@ -139,8 +142,8 @@ let command = Command(
             {
                 do
                 {
-                    let fetch = try core.fetch()
-                    let decode = try core.decode()
+                    try core.fetch()
+                    print(try core.decode())
                     let excute = try core.execute()
                 }
                 catch
@@ -161,8 +164,24 @@ let command = Command(
 
             if core.state == .environmentCall
             {
-                switch (core.service)
+                let service = core.service
+                switch (service[0])
                 {
+                    case 4:
+                        var cString = [UInt8]()
+                        var offset: UInt = 0
+                        var byte = try! core.memory.copy(service[1] + offset, count: 1)[0]
+                        while byte != 0
+                        {
+                            cString.append(byte)
+                            offset += 1              
+                            byte = try! core.memory.copy(service[1] + offset, count: 1)[0]    
+                        }
+                        cString.append(0)
+                        if let string = String(bytes: cString, encoding: String.Encoding.utf8)
+                        {
+                            print(">", string)
+                        }
                     case 10:
                         return
                     default:

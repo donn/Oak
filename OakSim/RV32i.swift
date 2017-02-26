@@ -23,7 +23,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)")!,
-                disassembly: "@mnem @arg, @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
        
@@ -186,7 +186,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
-                disassembly: "@mnem @arg, @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
        
@@ -293,7 +293,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
-                disassembly: "@mnem @arg, @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
 
@@ -458,7 +458,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?0?[boxd]?[0-9A-F]+)")!,
-                disassembly: "@mnem @arg, @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
        
@@ -524,7 +524,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
-                disassembly: "@mnem @arg, @arg(@arg)"
+                disassembly: "@mnem @arg0, @arg1(@arg2)"
             )
         )
        
@@ -625,7 +625,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
-                disassembly: "@mnem @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1"
             )
         )
        
@@ -755,7 +755,7 @@ extension InstructionSet
                     return unmangle
                    
                 }],
-                disassembly: "@mnem @arg, @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
        
@@ -958,7 +958,7 @@ extension InstructionSet
                     return unmangle
                    
                 }],
-                disassembly: "@mnem @arg, @arg"
+                disassembly: "@mnem @arg0, @arg1"
             )
         )
        
@@ -1067,7 +1067,7 @@ public class RV32iRegisterFile
             }
             file[index - 1] = newValue
         }
-    }    
+    }
 
     func reset()
     {
@@ -1098,7 +1098,7 @@ public class RV32iCore: Core
     public var registerFile: RV32iRegisterFile
 
     //Memory
-    internal var memory: Memory
+    public var memory: Memory
     
     //Program Counter
     public var programCounter: UInt32
@@ -1234,9 +1234,9 @@ public class RV32iCore: Core
         return dump
     }
 
-    public var service: Int
+    public var service: [UInt]
     {
-        return Int(registerFile[17])
+        return [UInt(registerFile[17]), UInt(registerFile[10]), UInt(registerFile[11]), UInt(registerFile[12]), UInt(registerFile[13]), UInt(registerFile[14]), UInt(registerFile[15]), UInt(registerFile[16])]
     }
 
     public init?(memorySize: Int = 4096)

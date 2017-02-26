@@ -33,7 +33,6 @@ Open your terminal, type:
 
 
 #To-do
-* Disassembly. Currently, the disassembler function does nothing, which makes it a bit difficult.
 * Core Abstraction. Make Core into a class rather than a protocol. Unlike Oak.js, the Assembler in Oak is extremely customizable, and the simulator should be similar, currently it's a part of the user program and not a customizable part of Oak.
 * Documentation. Documentation is sparse, and while it is easy to use, Oak's codebase can be quite intimidating still because of the size.
 * Access Control. It is unclear what should be public and what should be private.

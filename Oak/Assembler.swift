@@ -353,14 +353,14 @@ public class Assembler
                             address += 1
                             fallthrough
                         case .string:
-                            guard let regex = keywordRegexes[.string], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: line)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
                                 errorMessages.append(message)
                                 continue
                             }
-                            let array = Array(matches[0].characters)
+                            let array = Array(captures[1].characters)
                             for character in array
                             {
                                 if (character == "\\")
@@ -546,9 +546,11 @@ public class Assembler
                             
                             let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
                             
+                            print(limits)
+
                             if let limited = limits 
                             {
-                                field = limited[0]
+                                field = limited[1]
                                 bits = range.totalBits!
                             }
                             
@@ -559,7 +561,7 @@ public class Assembler
                                 guard let specialProcess = instruction.format.processSpecialParameter[field]
                                 else
                                 {
-                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Special parameter '\(field)'' missing parameter processor."
+                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Special parameter '\(field)' missing parameter processor."
                                     errorMessages = [message]
                                     return (errorMessages, machineCode)
                                 }
@@ -652,14 +654,14 @@ public class Assembler
                             address += 1
                             fallthrough
                         case .string:
-                            guard let regex = keywordRegexes[.string], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: line)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
                                 errorMessages.append(message)
                                 continue
                             }
-                            var characters = Array(matches[0].characters)
+                            var characters = Array(captures[1].characters)
                             var j = 0
                             while (j < characters.count)
                             {
@@ -885,7 +887,7 @@ public class Assembler
                     {
                         if let options1 = Assembler.options(from: list1)
                         {
-                            self.keywordRegexes[.string] = "\(options1)(.*)\(options1)"
+                            self.keywordRegexes[.string] = "\(options1)(.*?)\(options1)"
                         }
                     }
                 }

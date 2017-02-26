@@ -288,7 +288,16 @@ public class InstructionSet
     
     public func disassemble(_ instruction: Instruction, arguments: [UInt]) -> String
     {
-        return "(Oak Error: Disassembler function not yet implemented.)".blue.bold)
+        var output = instruction.format.disassembly
+        output = output.replacingOccurrences(of: "@mnem", with: instruction.mnemonic)
+        for range in instruction.format.ranges
+        {
+            if let parameter = range.parameter
+            {
+                output = output.replacingOccurrences(of: "@arg\(parameter)", with: (range.parameterType == .register) ? abiNames[Int(arguments[parameter])] : "\(arguments[parameter])")
+            }      
+        }
+        return output
     }
     
     /*

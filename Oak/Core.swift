@@ -31,12 +31,13 @@ public enum EnvironmentCalls
 //Core Protocols
 public protocol Core
 {
+    var memory: Memory { get set }
     var instructionSet: InstructionSet { get }
     var state: CoreState { get set }
-    var service: Int { get }
+    var service: [UInt] { get }
         
     func fetch() throws
     func decode() throws -> String
     func execute() throws -> String?
-    func loadProgram(machineCode: [UInt8]) throws    
+    func loadProgram(machineCode: [UInt8]) throws
 }

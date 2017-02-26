@@ -31,8 +31,10 @@ Open your terminal, type:
 
 ...and use the generated Xcode project file. It's gitignored though, as Xcode projects are not as flexible as the Swift Package Manager.
 
+# Known issues
+* Assembly is not tested to be 100% accurate yet and may result in crashes occasionally.
 
-#To-do
+# To-do
 * Core Abstraction. Make Core into a class rather than a protocol. Unlike Oak.js, the Assembler in Oak is extremely customizable, and the simulator should be similar, currently it's a part of the user program and not a customizable part of Oak.
 * Documentation. Documentation is sparse, and while it is easy to use, Oak's codebase can be quite intimidating still because of the size.
 * Access Control. It is unclear what should be public and what should be private.

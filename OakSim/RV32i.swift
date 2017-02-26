@@ -329,7 +329,7 @@ extension InstructionSet
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\s*\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
-                disassembly: "@mnem @arg, @arg(@arg)"
+                disassembly: "@mnem @arg0, @arg1(@arg2)"
             )
         )
        
@@ -692,7 +692,7 @@ extension InstructionSet
                         var radix = 10
                         var splice = false
                         
-                        if array[0] == "0"
+                        if array[0] == "0" && array.count > 1
                         {
                             if array[1] == "b"
                             {
@@ -725,6 +725,11 @@ extension InstructionSet
                         }
                         
                         int = UInt(interpretable, radix: radix)
+
+                        if let signed = Int(interpretable, radix: radix), int == nil
+                        {
+                            int = UInt(bitPattern: signed)
+                        }
                     }
                     
                     guard let unwrap = int
@@ -882,19 +887,19 @@ extension InstructionSet
                     (text: String, address: UInt, bits: Int, labels: [String: UInt]) -> (errorMessage: String?, value: UInt) in
                     let array = Array(text.characters) //Character View
                     var errorMessage: String?
-                    var value: UInt = 0
-                   
+                    var value: UInt = 0                   
                     var int: UInt?
+
                     if let target = labels[text]
                     {
-                        int = target - address
+                        int = target &- address
                     }
                     else
                     {
                         var radix = 10
                         var splice = false
                         
-                        if array[0] == "0"
+                        if array[0] == "0" && array.count > 1
                         {
                             if array[1] == "b"
                             {
@@ -927,15 +932,20 @@ extension InstructionSet
                         }
                         
                         int = UInt(interpretable, radix: radix)
+
+                        if let signed = Int(interpretable, radix: radix), int == nil
+                        {
+                            int = UInt(bitPattern: signed)
+                        }
                     }
-                    
+
                     guard let unwrap = int
                     else
                     {
                         errorMessage = "Immediate '\(text)' is not a recognized label, literal or character."
                         return (errorMessage, value)
                     }
-                   
+                        
                     if Utils.rangeCheck(unwrap, bits: 21)
                     {
                         var mangle = ((unwrap >> 12) & 255) //mangle[7:0] = int[19:12]

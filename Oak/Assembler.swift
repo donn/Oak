@@ -12,7 +12,7 @@ public enum Keyword
     case blockCommentBegin
     case blockCommentEnd
 
-    //Only send as KeywordRegex
+    //Only send as keywordRegexes
     case string
     case char
     case data
@@ -114,8 +114,8 @@ public class Assembler
                 {
                     var radix = 10
                     var splice = false
-                    
-                    if array[0] == "0"
+
+                    if array[0] == "0" && array.count > 1
                     {
                         if array[1] == "b"
                         {
@@ -148,6 +148,11 @@ public class Assembler
                     }
                     
                     int = UInt(interpretable, radix: radix)
+
+                    if let signed = Int(interpretable, radix: radix), int == nil
+                    {
+                        int = UInt(bitPattern: signed)
+                    }
                 }
                 
                 guard let unwrap = int
@@ -170,7 +175,7 @@ public class Assembler
                 var int: UInt?
                 if let target = labels[text]
                 {
-                    int = target - address
+                    int = target &- address
                 }
                 else
                 {
@@ -210,6 +215,11 @@ public class Assembler
                     }
                     
                     int = UInt(interpretable, radix: radix)
+
+                    if let signed = Int(interpretable, radix: radix), int == nil
+                    {
+                        int = UInt(bitPattern: signed)
+                    }
                 }
                 guard let unwrap = int
                 else
@@ -277,11 +287,13 @@ public class Assembler
             }
 
             var directiveString: String?
+            var directiveData: String?
             if let separator = keywordRegexes[.directive]
             {
                 if let captures = Regex(separator)!.captures(in: lineMutable)
                 {
                     directiveString = captures[1]
+                    directiveData = captures[2]
                 }
                 
             }
@@ -353,7 +365,7 @@ public class Assembler
                             address += 1
                             fallthrough
                         case .string:
-                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: line)
+                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
@@ -371,7 +383,7 @@ public class Assembler
                             }
                         //Ints and chars
                         case ._8bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: lineMutable)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No 8-bit values found."
@@ -380,7 +392,7 @@ public class Assembler
                             }
                             address += UInt(matches.count)
                         case ._16bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: lineMutable)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No 16-bit values found."
@@ -389,7 +401,7 @@ public class Assembler
                             }
                             address += UInt(matches.count << 1)
                         case ._32bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: lineMutable)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No 32-bit values found."
@@ -398,7 +410,7 @@ public class Assembler
                             }
                             address += UInt(matches.count << 2)
                         case ._64bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: lineMutable)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No 64-bit values found."
@@ -412,7 +424,7 @@ public class Assembler
                             errorMessages = [message]
                             return (errorMessages, labels, lines)
                         case .floatingPoint:
-                            guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: lineMutable)
+                            guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No floating point values found."
@@ -474,11 +486,13 @@ public class Assembler
             }
 
             var directiveString: String?
+            var directiveData: String?
             if let separator = keywordRegexes[.directive]
             {
                 if let captures = Regex(separator)!.captures(in: line)
                 {
                     directiveString = captures[1]
+                    directiveData = captures[2]
                 }
             }
             
@@ -535,24 +549,24 @@ public class Assembler
                     }
                     captures.removeFirst()
                     
+                    
+
                     for range in bitRanges
                     {
                         if let parameter = range.parameter
-                        {
+                        {    
                             var startBit = 0
                             var endBit: Int?
                             var bits = range.bits
                             var field = range.field
-                            
+
                             let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
-                            
-                            print(limits)
 
                             if let limited = limits 
                             {
                                 field = limited[1]
                                 bits = range.totalBits!
-                            }
+                            }                
                             
                             var register: UInt = 0
                             
@@ -654,7 +668,7 @@ public class Assembler
                             address += 1
                             fallthrough
                         case .string:
-                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: line)
+                            guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
@@ -698,7 +712,7 @@ public class Assembler
                         //Ints and chars
                         //To-do: make this more optimized because this is mostly identical code
                         case ._8bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
@@ -718,7 +732,7 @@ public class Assembler
                             }
                             address += UInt(matches.count)
                         case ._16bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
@@ -739,7 +753,7 @@ public class Assembler
                             }
                             address += UInt(matches.count << 1)
                         case ._32bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No 32-bit values found."
@@ -762,7 +776,7 @@ public class Assembler
                             }
                             address += UInt(matches.count << 2)
                         case ._64bit:
-                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: line)
+                            guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
@@ -794,7 +808,7 @@ public class Assembler
                             errorMessages = [message]
                             return (errorMessages, machineCode)
                         case .floatingPoint:
-                            guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: line)
+                            guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: directiveData!)
                             else
                             {
                                 let message = "\("Assembler Error:".red.bold) Line \(i): No floating point values found."
@@ -881,15 +895,15 @@ public class Assembler
             {
                 if let options = Assembler.options(from: list)
                 {
-                    self.keywordRegexes[.directive] = "\(options)([^\\s]+)"
+                    self.keywordRegexes[.directive] = "\(options)([^\\s]+)\\s*(.+)*"
+                }
+            }
                     
-                    if let list1 = words[.stringMarker]
-                    {
-                        if let options1 = Assembler.options(from: list1)
-                        {
-                            self.keywordRegexes[.string] = "\(options1)(.*?)\(options1)"
-                        }
-                    }
+            if let list = words[.stringMarker]
+            {
+                if let options = Assembler.options(from: list)
+                {
+                    self.keywordRegexes[.string] = "\(options)(.*?)\(options)"
                 }
             }
 

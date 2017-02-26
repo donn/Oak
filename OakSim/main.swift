@@ -185,7 +185,7 @@ let command = Command(
                     case 10:
                         return
                     default:
-                        print("Ignored unknown environment call service number \(core.service).")
+                        print("Ignored unknown environment call service number \(core.service[0]).")
                 }
                 core.state = .running
             }

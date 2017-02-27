@@ -1,6 +1,7 @@
 import Foundation
 import Oak
 import Guaka
+import Colors
 
 extension Array
 {
@@ -13,6 +14,69 @@ extension Array
     }
 }
 
+class ExecutionTimer
+{
+    var printIPS = false
+    var elapsed: Double?
+    var adjust: Double = 0.0
+    var wait: Double = 0.0
+    var counter: Int = 0
+
+    func reset()
+    {
+        adjust = Date().timeIntervalSince1970
+        counter = 0
+        wait = 0
+        elapsed = nil
+    }
+
+    func pause()
+    {
+        wait = Date().timeIntervalSince1970
+    }
+
+    func resume()
+    {
+        elapsed = nil
+        adjust += (Date().timeIntervalSince1970 - wait)
+        wait = 0
+    }
+
+    func stop()
+    {
+        elapsed = Date().timeIntervalSince1970 - adjust
+    }
+
+    func print()
+    {
+        let time = elapsed ?? (Date().timeIntervalSince1970 - adjust)
+        Swift.print("")        
+        NSLog("Time taken: %.02f seconds.", time)
+        if printIPS
+        {
+            NSLog("IPS: %.02f.", Double(counter) / time)
+        }
+    }
+
+    init(printIPS: Bool = false)
+    {
+        self.printIPS = printIPS
+    }
+
+}
+
+var timer = ExecutionTimer(printIPS: true)
+
+signal(SIGINT)
+{
+    (s: Int32) in
+    if 2...6 ~= s
+    {
+        timer.stop()
+        timer.print()
+        exit(0)
+    }
+}
 
 let command = Command(
     usage: "oak",
@@ -21,7 +85,8 @@ let command = Command(
         Flag(shortName: "o", longName: "output", type: String.self, description: "Assemble only, specify file path for binary dump."),
         Flag(shortName: "v", longName: "version", value: false, description: "Prints the current version."),
         Flag(shortName: "a", longName: "arch", value: "rv32i", description: "Picks the instruction set architecture."),
-        Flag(shortName: "s", longName: "simulate", type: String.self, description: "Simulate only. The arguments will be treated as binary files.")
+        Flag(shortName: "s", longName: "simulate", type: String.self, description: "Simulate only. The arguments will be treated as binary files."),
+        Flag(shortName: "d", longName: "debug", value: false, description: "Debug while simulating. Prints disassembly, allows for step-by-step execution.")
     ]
 )
 {
@@ -33,13 +98,15 @@ let command = Command(
         return
     }
 
+    var debug = flags.getBool(name: "debug") ?? false
+
     var isaChoice: String = "rv32i"
     if let arch = flags.getString(name: "arch"), !arch.isEmpty
     {
         isaChoice = arch
     }
 
-    var assembleOnly: Bool = false
+    var assembleOnly = false
     var outputPath: String?
     if let output = flags.getString(name: "output"), !output.isEmpty
     {
@@ -47,7 +114,7 @@ let command = Command(
         outputPath = output
     }
 
-    var simulateOnly: Bool = false    
+    var simulateOnly = false    
     if let input = flags.getString(name: "simulate"), !input.isEmpty
     {
         if assembleOnly
@@ -138,52 +205,38 @@ let command = Command(
             return
         }
 
-        var counter = 0
-        var starttime = Date().timeIntervalSince1970
-
+        timer.reset()
         while true
         {
+
+
+
             while core.state == .running
             {
-
                 do
                 {
                     try core.fetch()
-                    try core.decode()
+                    print(try core.decode())
                     try core.execute()
-                    counter += 1
+                    timer.counter += 1
 
-                    if counter > (1 << 15)
+                    if timer.counter == (1 << 14)
                     {
-                        print("Possible infinite loop.")
-                        var finishtime = Date().timeIntervalSince1970
-                        print("IPS: \(Double(counter) / (finishtime - starttime))")
-                        return
+                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
                     }
                 }
                 catch
                 {
                     print("Error: \(error).")
-                    var finishtime = Date().timeIntervalSince1970
-                    print("IPS: \(Double(counter) / (finishtime - starttime))")
+                    timer.stop()
+                    timer.print()
                     return
                 } 
             }
 
-            if core.state == .error
-            {
-                var finishtime = Date().timeIntervalSince1970
-                print("IPS: \(Double(counter) / (finishtime - starttime))")
-                return
-            }
-
-            if core.state == .environmentBreak
-            {
-                core.state = .running
-            }
-
             if core.state == .environmentCall
             {
+                timer.pause()
                 let service = core.service
                 switch (service[0])
                 {
@@ -204,13 +257,14 @@ let command = Command(
                         }
                     case 10:
                         print("Execution complete.")
-                        var finishtime = Date().timeIntervalSince1970
-                        print("IPS: \(Double(counter) / (finishtime - starttime))")
+                        timer.stop()
+                        timer.print()
                         return
                     default:
-                        print("Ignored unknown environment call service number \(core.service[0]).")
+                        print("\("Warning".yellow.bold): Ignored unknown environment call service number \(core.service[0]).")
                 }
                 core.state = .running
+                timer.resume()
             }
         }
     }

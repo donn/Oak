@@ -99,14 +99,16 @@ let command = Command(
         
         let lexed = assembler.lex(file)
 
-        if lexed.errorMessages.count != 0 {
+        if lexed.errorMessages.count != 0
+        {
             lexed.errorMessages.print()
             return
         }
 
         let assembled = assembler.assemble(lexed.lines, labels: lexed.labels)
 
-        if assembled.errorMessages.count != 0 {
+        if assembled.errorMessages.count != 0
+        {
             assembled.errorMessages.print()
             return
         }
@@ -136,24 +138,42 @@ let command = Command(
             return
         }
 
+        var counter = 0
+        var starttime = Date().timeIntervalSince1970
+
         while true
         {
             while core.state == .running
             {
+
                 do
                 {
                     try core.fetch()
-                    print(try core.decode())
-                    let excute = try core.execute()
+                    try core.decode()
+                    try core.execute()
+                    counter += 1
+
+                    if counter > (1 << 15)
+                    {
+                        print("Possible infinite loop.")
+                        var finishtime = Date().timeIntervalSince1970
+                        print("IPS: \(Double(counter) / (finishtime - starttime))")
+                        return
+                    }
                 }
                 catch
                 {
                     print("Error: \(error).")
+                    var finishtime = Date().timeIntervalSince1970
+                    print("IPS: \(Double(counter) / (finishtime - starttime))")
+                    return
                 } 
             }
 
             if core.state == .error
             {
+                var finishtime = Date().timeIntervalSince1970
+                print("IPS: \(Double(counter) / (finishtime - starttime))")
                 return
             }
 
@@ -183,6 +203,9 @@ let command = Command(
                             print(">", string)
                         }
                     case 10:
+                        print("Execution complete.")
+                        var finishtime = Date().timeIntervalSince1970
+                        print("IPS: \(Double(counter) / (finishtime - starttime))")
                         return
                     default:
                         print("Ignored unknown environment call service number \(core.service[0]).")

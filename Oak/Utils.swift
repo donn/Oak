@@ -52,8 +52,7 @@ public class Utils
     {
         var mutableValue = value
         let uBits = UInt(bits)
-
-        if ((mutableValue & (1 << (uBits - 1))) != 0)
+        if (mutableValue & (1 << (uBits - 1))) != 0
         {
             mutableValue = ((~(0) >> uBits) << uBits) | value
         }

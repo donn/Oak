@@ -682,7 +682,6 @@ extension InstructionSet
                     let array = Array(text.characters) //Character View
                     var errorMessage: String?
                     var value: UInt = 0
-                   
                     var int: UInt?
                     if let target = labels[text]
                     {
@@ -740,13 +739,12 @@ extension InstructionSet
                         return (errorMessage, value)
                     }
 
-                    print(text, "\t\t", Utils.pad(unwrap, digits: 32, radix:2), unwrap)
-
                     if Utils.rangeCheck(unwrap, bits: bits)
                     {
                         var mangle = unwrap & 2046 //mangle[10:1] = int[10:1]
                         mangle = mangle | ((unwrap >> 11) & 1) //mangle[0] = int[11]
                         mangle = mangle | ((unwrap >> 12) & 1) << 11 //mangle[11] = int[12]
+                        value = mangle
                         return (errorMessage, value)
                     }
 
@@ -957,7 +955,6 @@ extension InstructionSet
                         errorMessage = "Immediate '\(text)' is not a recognized label, literal or character."
                         return (errorMessage, value)
                     }
-                        
                     if Utils.rangeCheck(unwrap, bits: 21)
                     {
                         var mangle = ((unwrap >> 12) & 255) //mangle[7:0] = int[19:12]
@@ -1146,8 +1143,6 @@ public class RV32iCore: Core
                 bytes += try self.memory.copy(UInt(programCounter + 1), count: 3)
             }
             self.fetched = Utils.concatenate(bytes: bytes)
-
-            //print("0x\(Utils.pad(UInt(programCounter), digits: 8, radix: 16))", Utils.pad(fetched, digits: 32, radix: 2))
         }
         catch
         {
@@ -1193,14 +1188,14 @@ public class RV32iCore: Core
                 var limit = 0
                 
                 fields[parameter] = range.field
-
-                rawValues[parameter] |= ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)
                 
                 if let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
                 {
                     fields[parameter] = limits[1]
                     limit = Int(limits[3])!
                 }
+
+                rawValues[parameter] |= ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)
             }
         }
         for range in bitRanges

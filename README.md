@@ -6,20 +6,21 @@
 
 The hackable, extensible, pure Swift instruction set simulator for Unix (assembly included).
 
-Designed for ARM initially, currently supports RISC-V.
+The ultimate aim for this project is to have a terminal and later GUI app to practice and create various instruction set architectures that is easy to both use *and* modify.
+
+While designed for ARM initially, as one of [Oak.js](https://github.com/skyus/Oak.js) requirements was RISC-V, Oak's backport currently supports RISC-V, but ARM should be coming soon enough.
 
 # Requirements
 Swift 3.1-dev (Jan 28th Snapshot or later). Supported on both macOS and Linux.
 
 # Usage
-Well, more like development environment setup at the moment really...
-
 ## Unix
 To build and test:
 
 ```bash
-    swift build
-    .build/debug/OakSim [your-file-here]
+    make
+    make install
+    oak <your-file-here>
 ```
 
 ### macOS (Xcode)
@@ -30,15 +31,6 @@ Open your terminal, type:
 ```
 
 ...and use the generated Xcode project file. It's gitignored though, as Xcode projects are not as flexible as the Swift Package Manager.
-
-# Known issues
-* Assembly is not tested to be 100% accurate yet and may result in crashes occasionally.
-
-# To-do
-* Core Abstraction. Make Core into a class rather than a protocol. Unlike Oak.js, the Assembler in Oak is extremely customizable, and the simulator should be similar, currently it's a part of the user program and not a customizable part of Oak.
-* Documentation. Documentation is sparse, and while it is easy to use, Oak's codebase can be quite intimidating still because of the size.
-* Access Control. It is unclear what should be public and what should be private.
-* Makefile?
 
 # License
 Mozilla Public License 2.0. Check LICENSE.

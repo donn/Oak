@@ -56,6 +56,7 @@ class ExecutionTimer
         {
             NSLog("IPS: %.02f.", Double(counter) / time)
         }
+        Swift.print("")
     }
 
     init(printIPS: Bool = false)
@@ -95,7 +96,10 @@ let command = Command(
     (flags, arguments) in
     if flags.getBool(name: "version") ?? false
     {
-        print("Oak CLI - Alpha 0.1")
+        print("Oak · Alpha 0.2")
+        print("All rights reserved.")
+        print("You should have obtained a copy of the Mozilla Public License with your application.")
+        print("If you did not, a verbatim copy should be available at https://www.mozilla.org/en-US/MPL/2.0/.")
         return
     }
 

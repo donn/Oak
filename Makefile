@@ -2,19 +2,14 @@ Name = Oak
 
 all:
 	@swift build  -c release
+	@cp ./.build/release/OakSim ./.build/oak
 
 debug:
 	@swift build
-
-installd:
-	@cp ./.build/debug/OakSim ~/bin/oak
-
-fastdeb:
-	@swift build
-	@cp ./.build/debug/OakSim ~/bin/oak
+	@cp ./.build/debug/OakSim ./.build/oak
 
 install:
-	@cp ./.build/release/OakSim ~/bin/oak
+	@cp ./.build/oak ~/bin/oak
 
 clean:
 	@rm -rf .build/

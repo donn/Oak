@@ -7,9 +7,9 @@ extension Array
 {
     public func print()
     {
-        for element in self
+        for (i, element) in self.enumerated()
         {
-            Swift.print(element)
+            Swift.print(i, element)
         }
     }
 }
@@ -72,6 +72,7 @@ signal(SIGINT)
     (s: Int32) in
     if 2...6 ~= s
     {
+        print("")
         timer.stop()
         timer.print()
         exit(0)
@@ -85,13 +86,13 @@ let command = Command(
         Flag(shortName: "o", longName: "output", type: String.self, description: "Assemble only, specify file path for binary dump."),
         Flag(shortName: "v", longName: "version", value: false, description: "Prints the current version."),
         Flag(shortName: "a", longName: "arch", value: "rv32i", description: "Picks the instruction set architecture."),
-        Flag(shortName: "s", longName: "simulate", type: String.self, description: "Simulate only. The arguments will be treated as binary files."),
+        Flag(shortName: "s", longName: "simulate", value: false, description: "Simulate only. The arguments will be treated as binary files."),
         Flag(shortName: "d", longName: "debug", value: false, description: "Debug while simulating. Prints disassembly, allows for step-by-step execution.")
+        
     ]
 )
 {
     (flags, arguments) in
-
     if flags.getBool(name: "version") ?? false
     {
         print("Oak CLI - Alpha 0.1")
@@ -114,15 +115,11 @@ let command = Command(
         outputPath = output
     }
 
-    var simulateOnly = false    
-    if let input = flags.getString(name: "simulate"), !input.isEmpty
+    var simulateOnly = flags.getBool(name: "simulate") ?? false
+    if assembleOnly && simulateOnly
     {
-        if assembleOnly
-        {
-            print("Error: --simulate and --output are mutually exclusive.")
-            return
-        }
-        simulateOnly = true
+        print("Error: --simulate and --output are mutually exclusive.")
+        return
     }
 
     var coreChoice: Core?
@@ -139,7 +136,7 @@ let command = Command(
     }
 
     var core = coreChoice!
-
+    var machineCode: [UInt8]
     if arguments.count != 1
     {
         print("Error: Oak needs at least/at most one file.")
@@ -153,13 +150,13 @@ let command = Command(
         return
     }
 
-    var machineCode: [UInt8]
     if simulateOnly
     {
         machineCode = try! defile.dumpBytes()
     }
     else
     {
+        
         let assembler = Assembler(for: core.instructionSet)
 
         let file = try! defile.dumpString()
@@ -192,12 +189,19 @@ let command = Command(
             print("Error: Opening file \(binPath) for writing failed.")
             return
         }
+
+        do
+        {
+            try defile.write(bytes:machineCode)
+        } catch {
+            print("\(error)")
+        }
     }
     else
     {
         do
         {
-            try core.loadProgram(machineCode: machineCode)
+           try core.loadProgram(machineCode: machineCode)
         }
         catch
         {
@@ -216,14 +220,15 @@ let command = Command(
                 do
                 {
                     try core.fetch()
-                    print(try core.decode())
-                    try core.execute()
+                    let disassembly = try core.decode()
+                    //print(disassembly)
                     timer.counter += 1
 
                     if timer.counter == (1 << 14)
                     {
                         print("\("Oak Warning".green.bold): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
                     }
+                    try core.execute()
                 }
                 catch
                 {
@@ -240,6 +245,8 @@ let command = Command(
                 let service = core.service
                 switch (service[0])
                 {
+                    case 1:
+                        print(">", service[1])
                     case 4:
                         var cString = [UInt8]()
                         var offset: UInt = 0

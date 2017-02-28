@@ -41,7 +41,7 @@ extension InstructionSet
             {
                 (rv32i: Core) in
                 let core = rv32i as! RV32iCore
-                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(bitPattern: core.registerFile[Int(core.arguments[1])]))
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
                 core.programCounter += 4
                 return nil
             }
@@ -50,12 +50,12 @@ extension InstructionSet
         instructions.append(Instruction(
             "SUB",
             format: rType,
-            constants: ["opcode": 0b0110011, "funct3": 0b000, "funct7": 0b000],
+            constants: ["opcode": 0b0110011, "funct3": 0b000, "funct7": 0b0100000],
             executor:
             {
                 (rv32i: Core) in
                 let core = rv32i as! RV32iCore
-                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &- Int32(bitPattern: core.registerFile[Int(core.arguments[1])]))
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &- Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
                 core.programCounter += 4
                 return nil
             }
@@ -370,6 +370,7 @@ extension InstructionSet
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
+                    core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4                    
                     return nil
                 }
@@ -403,7 +404,7 @@ extension InstructionSet
         instructions.append(Instruction(
             "LBU",
             format: ilSubtype,
-            constants: ["opcode": 0b0000011, "funct3": 0b000],
+            constants: ["opcode": 0b0000011, "funct3": 0b100],
             executor:
             {
                 (rv32i: Core) in
@@ -426,7 +427,7 @@ extension InstructionSet
         instructions.append(Instruction(
             "LHU",
             format: ilSubtype,
-            constants: ["opcode": 0b0000011, "funct3": 0b001],
+            constants: ["opcode": 0b0000011, "funct3": 0b101],
             executor:
             {
                 (rv32i: Core) in
@@ -739,12 +740,13 @@ extension InstructionSet
                         return (errorMessage, value)
                     }
 
+                    print(text, "\t\t", Utils.pad(unwrap, digits: 32, radix:2), unwrap)
+
                     if Utils.rangeCheck(unwrap, bits: bits)
                     {
                         var mangle = unwrap & 2046 //mangle[10:1] = int[10:1]
                         mangle = mangle | ((unwrap >> 11) & 1) //mangle[0] = int[11]
                         mangle = mangle | ((unwrap >> 12) & 1) << 11 //mangle[11] = int[12]
-                        value = mangle
                         return (errorMessage, value)
                     }
 
@@ -754,9 +756,9 @@ extension InstructionSet
                 specialParameterDisassemblers: ["imm":
                 {
                     (value: UInt) in
-                    var unmangle = (value & 1) << 11 //unmangle[11] = value[0]
-                    unmangle = unmangle | ((value >> 11) << 12) //unmangle[12] = value[12]
-                    unmangle = unmangle | (value & 2046) //unmangle[10:1] = value[10:1]
+                    var unmangle = value & 2046 //value[10:1] = mangle[10:1]
+                    unmangle = unmangle | (value & 1) << 11  //value[11] = mangle[0]
+                    unmangle = unmangle | ((value >> 11) & 1) << 12 //value[12] = mangle[11]
                     return unmangle
                    
                 }],
@@ -782,6 +784,7 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] == core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -799,6 +802,7 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] != core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -816,6 +820,8 @@ extension InstructionSet
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
+
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -833,6 +839,8 @@ extension InstructionSet
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) >= Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
+
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -850,6 +858,8 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] < core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
+
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -867,6 +877,8 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] >= core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
+
+                    return nil
                 }
                 core.programCounter += 4
                 return nil
@@ -1134,6 +1146,8 @@ public class RV32iCore: Core
                 bytes += try self.memory.copy(UInt(programCounter + 1), count: 3)
             }
             self.fetched = Utils.concatenate(bytes: bytes)
+
+            //print("0x\(Utils.pad(UInt(programCounter), digits: 8, radix: 16))", Utils.pad(fetched, digits: 32, radix: 2))
         }
         catch
         {
@@ -1144,11 +1158,15 @@ public class RV32iCore: Core
     
     //Decode...
     var decoded: Instruction?
+    var rawValues = [UInt]()
     var arguments = [UInt]()
+    var fields = [Int: String]()
     public func decode() throws -> String
     {
         self.decoded = nil
         self.arguments = [UInt](repeating: 0, count: 16)
+        self.rawValues = [UInt](repeating: 0, count: 16)
+        self.fields = [:]
 
         guard let instruction = instructionSet.instruction(matching: self.fetched)
         else
@@ -1174,35 +1192,40 @@ public class RV32iCore: Core
             {
                 var limit = 0
                 
-                var field = range.field
-                var bits = range.bits
+                fields[parameter] = range.field
+
+                rawValues[parameter] |= ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)
                 
                 if let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
                 {
-                    field = limits[1]
+                    fields[parameter] = limits[1]
                     limit = Int(limits[3])!
-                    bits = range.totalBits!
                 }
-                
-                var value = ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)
-                
+            }
+        }
+        for range in bitRanges
+        {
+            if let parameter = range.parameter
+            {    
+                var value: UInt = rawValues[parameter]
+
                 if (range.parameterType == .special)
                 {
-                    guard let disassembleSpecialParameter = instruction.format.disassembleSpecialParameter[field]
+                    guard let disassembleSpecialParameter = instruction.format.disassembleSpecialParameter[fields[parameter]!]
                     else
                     {
                         state = .error
-                        print("\("Instruction Set Error:".blue.bold) Special parameter disassembler not found for field \(field).")
+                        print("\("Instruction Set Error:".blue.bold) Special parameter disassembler not found for field \(fields[parameter]!).")
                         throw CoreError.isaError
                     }
-                    value = disassembleSpecialParameter(value) //Unmangle...
+                    value = disassembleSpecialParameter(rawValues[parameter]) //Unmangle...
                 }
                 
                 arguments[parameter] = value
 
                 if (range.signExtended && range.parameterType != Parameter.register)
                 {
-                    arguments[parameter] = Utils.signExt(value, bits: bits)
+                    arguments[parameter] = Utils.signExt(value, bits: range.totalBits ?? range.bits)
                 }
             }
         }
@@ -1254,6 +1277,21 @@ public class RV32iCore: Core
     public var service: [UInt]
     {
         return [UInt(registerFile[17]), UInt(registerFile[10]), UInt(registerFile[11]), UInt(registerFile[12]), UInt(registerFile[13]), UInt(registerFile[14]), UInt(registerFile[15]), UInt(registerFile[16])]
+    }
+
+    public var registers: [(abiName: String, value: UInt)]
+    {
+        var array = [(abiName: String, value: UInt)]()
+        for i in 0...31
+        {
+            array.append((abiName: instructionSet.abiNames[i], value: UInt(registerFile[i])))
+        }
+        return array
+    }
+
+    public var pc: UInt
+    {
+        return UInt(programCounter)
     }
 
     public init?(memorySize: Int = 4096)

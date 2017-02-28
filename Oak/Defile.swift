@@ -197,15 +197,15 @@ public class Defile
         }
 
         var bytes = [UInt8]()
-        var character: Int32
+        var character: Int32 = 0
         for _ in 0..<count
         {
-            character = fgetc(file)
+            fread(&character, 1, 1, file);
             if character == EOF
             {
                 return nil
             }
-            bytes.append(UInt8(character))
+            bytes.append(UInt8(character & 0xFF))
         }
 
         return bytes

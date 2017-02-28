@@ -12,4 +12,6 @@ DerivedData/
 Packages/
 Package.pins
 **/*.bin
-*.bin
+
+## Runtime
+**/*.log

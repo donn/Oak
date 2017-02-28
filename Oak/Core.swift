@@ -35,6 +35,8 @@ public protocol Core
     var instructionSet: InstructionSet { get }
     var state: CoreState { get set }
     var service: [UInt] { get }
+    var registers:  [(abiName: String, value: UInt)] { get }
+    var pc: UInt { get }
         
     func fetch() throws
     func decode() throws -> String

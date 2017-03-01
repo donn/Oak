@@ -104,7 +104,7 @@ let command = Command(
     }
 
     var debug = flags.getBool(name: "debug") ?? false
-
+    print(debug)
     var isaChoice: String = "rv32i"
     if let arch = flags.getString(name: "arch"), !arch.isEmpty
     {
@@ -225,7 +225,10 @@ let command = Command(
                 {
                     try core.fetch()
                     let disassembly = try core.decode()
-                    //print(disassembly)
+                    if debug
+                    {
+                        print(disassembly)
+                    }
                     timer.counter += 1
 
                     if timer.counter == (1 << 14)

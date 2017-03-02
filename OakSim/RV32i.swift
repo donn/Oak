@@ -43,7 +43,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -57,7 +57,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &- Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -71,7 +71,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << core.registerFile[Int(core.arguments[2])]
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -85,7 +85,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = (Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[2])])) ? 1 : 0
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -99,7 +99,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = (core.registerFile[Int(core.arguments[1])] < core.registerFile[Int(core.arguments[2])]) ? 1 : 0
                 core.programCounter += 4
-                return nil
+                
             },
             available: false
         ))
@@ -114,7 +114,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] ^ core.registerFile[Int(core.arguments[2])]
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -128,7 +128,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> core.registerFile[Int(core.arguments[2])]
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -142,7 +142,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -156,7 +156,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] | core.registerFile[Int(core.arguments[2])]
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -170,7 +170,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] & core.registerFile[Int(core.arguments[2])]
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -206,7 +206,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.programCounter) + 4
                 core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) + Int32(truncatingBitPattern: core.arguments[2]))
-                return nil
+                
             }
         ))
        
@@ -220,7 +220,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) &+ Int32(truncatingBitPattern: core.arguments[2]))
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -234,7 +234,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = (Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) < Int32(truncatingBitPattern: core.arguments[2])) ? 1 : 0
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -248,7 +248,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] ^ UInt32(core.arguments[2])
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -262,7 +262,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] | UInt32(core.arguments[2])
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -276,7 +276,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] & UInt32(core.arguments[2])
                 core.programCounter += 4
-                return nil
+                
             }
         ))
 
@@ -312,7 +312,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = (core.registerFile[Int(core.arguments[1])] < UInt32(core.arguments[2]) ? 1 : 0)
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -349,12 +349,13 @@ extension InstructionSet
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
-                    core.registerFile[Int(core.arguments[0])] = UInt32(Utils.signExt(UInt(bytes[0]), bits: 8))
-                    core.programCounter += 4
-                    return nil
+                    core.registerFile[Int(core.arguments[0])] = UInt32(truncatingBitPattern: Utils.signExt(UInt(bytes[0]), bits: 8))
+                    core.programCounter += 4    
                 }
-                catch {
-                    return "\(error)"
+                catch
+                {
+                    print("Error")
+                    throw error
                 }
             }
         ))
@@ -372,10 +373,11 @@ extension InstructionSet
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4                    
-                    return nil
+                    
                 }
-                catch {
-                    return "\(error)"
+                catch 
+                {
+                    throw error
                 }
             }
         ))
@@ -393,10 +395,11 @@ extension InstructionSet
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 4)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4
-                    return nil
+                    
                 }
-                catch {
-                    return "\(error)"
+                catch 
+                {
+                    throw error
                 }
         }
         ))
@@ -414,13 +417,13 @@ extension InstructionSet
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
                     core.registerFile[Int(core.arguments[0])] = UInt32(bytes[0])
                     core.programCounter += 4
-                    return nil
+                    
                 }
                 catch
                 {
                     throw error
                 }
-                return nil
+                
             }
         ))
        
@@ -437,12 +440,13 @@ extension InstructionSet
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4
-                    return nil
+                    
                 }
-                catch {
-                    return "\(error)"
+                catch
+                {
+                    throw error
                 }
-                return nil
+                
             }
         ))
        
@@ -479,7 +483,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << UInt32(core.arguments[2])
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -493,7 +497,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> UInt32(core.arguments[2])
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -507,7 +511,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: UInt32(core.arguments[2])))
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -548,13 +552,13 @@ extension InstructionSet
                 do
                 {
                     try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
-                }
-                catch
+                }                
+                catch 
                 {
-                    return "\(error)"
+                    throw error
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -575,12 +579,12 @@ extension InstructionSet
                 {
                     try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
                 }
-                catch
+                catch 
                 {
-                    return "\(error)"
+                    throw error
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -605,12 +609,12 @@ extension InstructionSet
                 {
                     try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
                 }
-                catch
+                catch 
                 {
-                    return "\(error)"
+                    throw error
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -646,7 +650,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.arguments[1] << 12)
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -660,7 +664,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.arguments[1] << 12) + (core.programCounter)
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -782,10 +786,10 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] == core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -800,10 +804,9 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] != core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
             }
         ))
        
@@ -818,11 +821,10 @@ extension InstructionSet
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
-
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
+                return
             }
         ))
        
@@ -837,11 +839,9 @@ extension InstructionSet
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) >= Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
-
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
             }
         ))
        
@@ -856,11 +856,10 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] < core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
-
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -875,11 +874,10 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] >= core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
-
-                    return nil
+                    return
                 }
                 core.programCounter += 4
-                return nil
+                
             }
         ))
        
@@ -997,7 +995,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.programCounter + 4
                 core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[1]))
-                return nil
+                
             }
         ))
        
@@ -1029,7 +1027,7 @@ extension InstructionSet
                     let core = rv32i as! RV32iCore
                     core.state = .environmentCall
                     core.programCounter += 4
-                    return nil
+                    
                 }
                
             )
@@ -1132,7 +1130,7 @@ public class RV32iCore: Core
     }
     
     //Fetch...
-    var fetched: UInt
+    public var fetched: UInt
     public func fetch() throws
     {
         do
@@ -1152,94 +1150,11 @@ public class RV32iCore: Core
     }
     
     //Decode...
-    var decoded: Instruction?
-    var rawValues = [UInt]()
-    var arguments = [UInt]()
-    var fields = [Int: String]()
-    public func decode() throws -> String
-    {
-        self.decoded = nil
-        self.arguments = [UInt](repeating: 0, count: 16)
-        self.rawValues = [UInt](repeating: 0, count: 16)
-        self.fields = [:]
-
-        guard let instruction = instructionSet.instruction(matching: self.fetched)
-        else
-        {
-            state = .error
-            throw CoreError.unrecognizedInstruction
-        }
-        
-        if !instruction.available
-        {
-            state = .error
-            throw CoreError.unavailableInstruction
-        }
-        
-        self.decoded = instruction
-        
-        let format = instruction.format
-        let bitRanges = format.ranges;
-        
-        for range in bitRanges
-        {
-            if let parameter = range.parameter
-            {
-                var limit = 0
-                
-                fields[parameter] = range.field
-                
-                if let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
-                {
-                    fields[parameter] = limits[1]
-                    limit = Int(limits[3])!
-                }
-
-                rawValues[parameter] |= ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)
-            }
-        }
-        for range in bitRanges
-        {
-            if let parameter = range.parameter
-            {    
-                var value: UInt = rawValues[parameter]
-
-                if (range.parameterType == .special)
-                {
-                    guard let disassembleSpecialParameter = instruction.format.disassembleSpecialParameter[fields[parameter]!]
-                    else
-                    {
-                        state = .error
-                        print("\("Instruction Set Error:".blue.bold) Special parameter disassembler not found for field \(fields[parameter]!).")
-                        throw CoreError.isaError
-                    }
-                    value = disassembleSpecialParameter(rawValues[parameter]) //Unmangle...
-                }
-                
-                arguments[parameter] = value
-
-                if (range.signExtended && range.parameterType != Parameter.register)
-                {
-                    arguments[parameter] = Utils.signExt(value, bits: range.totalBits ?? range.bits)
-                }
-            }
-        }
-
-        return instructionSet.disassemble(instruction, arguments: arguments)
-    }
+    public var decoded: Instruction?
+    public var rawValues = [UInt]()
+    public var arguments = [UInt]()
+    public var fields = [Int: String]()
     
-    //Returns null on success, error message on error.
-    public func execute() throws -> String?
-    {
-        do
-        {
-            return try decoded!.execute(self)
-        }
-        catch
-        {
-            throw error
-        }
-    }
 
     public func loadProgram(machineCode: [UInt8]) throws
     {

@@ -98,13 +98,12 @@ let command = Command(
     {
         print("Oak · Alpha 0.2")
         print("All rights reserved.")
-        print("You should have obtained a copy of the Mozilla Public License with your application.")
+        print("You should have obtained a copy of the Mozilla Public License with your app.")
         print("If you did not, a verbatim copy should be available at https://www.mozilla.org/en-US/MPL/2.0/.")
         return
     }
 
     var debug = flags.getBool(name: "debug") ?? false
-
     var isaChoice: String = "rv32i"
     if let arch = flags.getString(name: "arch"), !arch.isEmpty
     {
@@ -159,8 +158,7 @@ let command = Command(
         machineCode = try! defile.dumpBytes()
     }
     else
-    {
-        
+    {        
         let assembler = Assembler(for: core.instructionSet)
 
         let file = try! defile.dumpString()
@@ -216,16 +214,17 @@ let command = Command(
         timer.reset()
         while true
         {
-
-
-
             while core.state == .running
             {
                 do
                 {
                     try core.fetch()
                     let disassembly = try core.decode()
-                    //print(disassembly)
+                    if debug
+                    {
+                        print(core.pc, disassembly)
+                        //print((core as! RV32iCore).registerDump())
+                    }
                     timer.counter += 1
 
                     if timer.counter == (1 << 14)

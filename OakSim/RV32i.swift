@@ -786,7 +786,7 @@ extension InstructionSet
                 if core.registerFile[Int(core.arguments[0])] == core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
-                    
+                    return
                 }
                 core.programCounter += 4
                 

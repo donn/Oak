@@ -75,6 +75,7 @@ public class Instruction
     public var constants: [String: UInt]
     public var available: Bool
     public var execute: (Core) throws -> ()
+    public var ignoredFields: [String]
     
     /*
      Mask
@@ -200,7 +201,7 @@ public class Instruction
      template: Optional. See "computedTemplate".
     */
 
-    public init(_ mnemonic: String, format: Format, constants: [String: UInt], executor execute: @escaping (Core) throws -> (), available: Bool = true, mask precomputedMask: String? = nil, template precomputedTemplate: UInt? = nil)
+    public init(_ mnemonic: String, format: Format, constants: [String: UInt], executor execute: @escaping (Core) throws -> (), available: Bool = true, mask precomputedMask: String? = nil, template precomputedTemplate: UInt? = nil, ignoredFields: [String] = [])
     {
         self.mnemonic = mnemonic
         self.format = format
@@ -209,6 +210,7 @@ public class Instruction
         self.computedMask = precomputedMask
         self.computedTemplate = precomputedTemplate
         self.execute = execute
+        self.ignoredFields = ignoredFields
     }
     
 }

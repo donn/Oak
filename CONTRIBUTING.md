@@ -6,7 +6,6 @@ I would love it if you contribute. There are just two key guidelines for contrib
 
 # What Needs To Be Done
 Here are the most important things Oak needs at the moment:
-* Core Abstraction. Make Core into a class rather than a protocol. Unlike Oak.js, the Assembler in Oak is extremely customizable, and the simulator should be similar, currently it's a part of the user program and not a customizable part of Oak.
 * Pseudo Instruction support. We need li, la, jr and other conveniences. Unlike Oak.js, using a [hacky method](https://github.com/Skyus/Oak.js/blob/master/Sources/RISCV.ts#L915) is not something I want to do here, this needs to be done properly.
 * Documentation. Documentation is sparse, and while it is easy to use, Oak's codebase can be quite intimidating still because of the size.
 

@@ -475,7 +475,7 @@ public class Assembler
         var text = true
 
         var skipLine = false
-        for (i, line) in lines.enumerated()
+        assembling: for (i, line) in lines.enumerated()
         {
             skipLine = false
 
@@ -551,7 +551,7 @@ public class Assembler
                     
                     
 
-                    for range in bitRanges
+                    for (i, range) in bitRanges.enumerated()
                     {
                         if let parameter = range.parameter
                         {    
@@ -582,6 +582,16 @@ public class Assembler
                                 let processed = specialProcess(captures[parameter], address, bits, labels)
                                 if let error = processed.errorMessage
                                 {
+                                    /*
+                                        If you find another bitrange that uses this parameter, just ignore this parameter.
+                                    */
+                                    for j in (i + 1)..<bitRanges.count
+                                    {
+                                        if bitRanges[j].parameter == parameter
+                                        {
+                                            continue assembling
+                                        }
+                                    }
                                     let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
                                     errorMessages.append(message)
                                     skipLine = true

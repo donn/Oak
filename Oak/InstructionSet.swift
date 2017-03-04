@@ -22,6 +22,7 @@ public enum AssemblyError: Error
 public class BitRange
 {
     public var field: String
+    public var condition: ((UInt) -> (Bool))?
     public var start: Int
     public var bits: Int
     public var totalBits: Int? //If the immediate is mangled in any form, also save the post-mangling length
@@ -35,9 +36,10 @@ public class BitRange
         return start + bits - 1
     }      
     
-    public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
+    public init(_ field: String, condition: ((UInt) -> (Bool))? = nil, at start: Int, bits: Int, totalBits: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
+        self.condition = condition
         self.start = start
         self.bits = bits
         self.totalBits = totalBits

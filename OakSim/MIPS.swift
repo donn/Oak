@@ -1,4 +1,5 @@
-//The RISC-V RV32i Instruction Set, Version 2.1
+//The MIPS Instruction Set, Version 2.1
+//🐰
 import Oak
 
 extension InstructionSet
@@ -16,11 +17,11 @@ extension InstructionSet
                 ranges:
                 [
                     BitRange("opcode", at: 26, bits: 6),
-                    BitRange("rs", at: 21, bits: 5, parameter: 2, parameterType: .register, parameterDefaultValue: 0),
                     BitRange("rt", at: 16, bits: 5, parameter: 1, parameterType: .register),
                     BitRange("rd", at: 11, bits: 5, parameter: 0, parameterType: .register),
-                    BitRange("shamt", at: 6, bits: 5, parameter: 0, parameterType: .immediate, parameterDefaultValue: 0),
-                    BitRange("funct", at: 0, bits: 6)
+                    BitRange("funct", at: 0, bits: 6),
+                    BitRange("rs", condition: { 0...7 ~= ($0 & 63) }, at: 21, bits: 5, parameter: 2, parameterType: .register),
+                    BitRange("shamt", condition: { !(0...7 ~= ($0 & 63)) }, at: 6, bits: 5, parameter: 0, parameterType: .immediate)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
@@ -39,10 +40,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x20],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) + Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -53,10 +54,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x21],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -67,10 +68,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x22],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) - Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -81,10 +82,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x23],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &- Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -95,10 +96,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x24],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] & core.registerFile[Int(core.arguments[2])]
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -109,10 +110,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x25],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] | core.registerFile[Int(core.arguments[2])]
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -123,10 +124,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x26],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] ^ core.registerFile[Int(core.arguments[2])]
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -137,10 +138,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x27],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = ~(core.registerFile[Int(core.arguments[1])] | core.registerFile[Int(core.arguments[2])])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -151,10 +152,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x2A],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[2])])) ? 1 : 0
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -165,10 +166,10 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x2B],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (core.registerFile[Int(core.arguments[1])] < core.registerFile[Int(core.arguments[2])]) ? 1 : 0
-                core.programCounter += 4
+                
                 
             },
             available: false
@@ -180,10 +181,94 @@ extension InstructionSet
             constants: ["opcode": 0x0, "funct": 0x08],
             executor:
             {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> core.registerFile[Int(core.arguments[2])]
+                
+                
+            }
+        ))
+
+        instructions.append(Instruction(
+            "SLL",
+            format: isSubtype,
+            constants: ["opcode": 0x0, "funct": 0x00],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << UInt32(core.arguments[2])
+                
+                
+            }
+        ))
+
+        instructions.append(Instruction(
+            "SRL",
+            format: isSubtype,
+            constants: ["opcode": 0x0, "funct": 0x02],
+            executor:
+            {
                 (rv32i: Core) in
                 let core = rv32i as! RV32iCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> UInt32(core.arguments[2])
+                
+                
+            }
+        ))
+       
+        instructions.append(Instruction(
+            "SRA",
+            format: isSubtype,
+            constants: ["opcode": 0x0, "funct": 0x03],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: UInt32(core.arguments[2])))
+                
+                
+            }
+        ))
+
+        instructions.append(Instruction(
+            "SLLV",
+            format: rType,
+            constants: ["opcode": 0x0, "funct": 0x04],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << core.registerFile[Int(core.arguments[2])]
+                
+                
+            }
+        ))        
+
+        instructions.append(Instruction(
+            "SRLV",
+            format: rType,
+            constants: ["opcode": 0x0, "funct": 0x06],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> core.registerFile[Int(core.arguments[2])]
-                core.programCounter += 4
+                
+                
+            }
+        ))
+       
+        instructions.append(Instruction(
+            "SRAV",
+            format: rType,
+            constants: ["opcode": 0x0, "funct": 0x07],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
+                
                 
             }
         ))
@@ -193,11 +278,10 @@ extension InstructionSet
             Format(
                 ranges:
                 [
-                    BitRange("imm", at: 20, bits: 12, parameter: 2, parameterType: .immediate, signExtended: true),
-                    BitRange("rs1", at: 15, bits: 5, parameter: 1, parameterType: .register),
-                    BitRange("funct3", at: 12, bits: 3),
-                    BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
-                    BitRange("opcode", at: 0, bits: 7)
+                    BitRange("opcode", at: 26, bits: 6),
+                    BitRange("rs", at: 21, bits: 5, parameter: 2, parameterType: .register),
+                    BitRange("rt", at: 16, bits: 5, parameter: 1, parameterType: .register),
+                    BitRange("imm", at: 0, bits: 16, parameter: 0, parameterType: .immediate)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
@@ -211,43 +295,56 @@ extension InstructionSet
         }
        
         instructions.append(Instruction(
+            "ADDI",
+            format: iType,
+            constants: ["opcode": 0x8],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) + Int32(truncatingBitPattern: core.arguments[2]))
+                
+                
+            }
+        ))
+
+        instructions.append(Instruction(
+            "ADDIU",
+            format: iType,
+            constants: ["opcode": 0x9],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) &+ Int32(truncatingBitPattern: core.arguments[2]))
+                
+                
+            }
+        ))       
+       
+        instructions.append(Instruction(
             "JALR",
             format: iType,
             constants: ["opcode": 0b1100111, "funct3": 0b000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.programCounter) + 4
                 core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) + Int32(truncatingBitPattern: core.arguments[2]))
                 
             }
         ))
-       
-        instructions.append(Instruction(
-            "ADDI",
-            format: iType,
-            constants: ["opcode": 0b0010011, "funct3": 0b000],
-            executor:
-            {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
-                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) &+ Int32(truncatingBitPattern: core.arguments[2]))
-                core.programCounter += 4
-                
-            }
-        ))
-       
         instructions.append(Instruction(
             "SLTI",
             format: iType,
             constants: ["opcode": 0b0010011, "funct3": 0b010],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) < Int32(truncatingBitPattern: core.arguments[2])) ? 1 : 0
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -258,10 +355,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b100],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] ^ UInt32(core.arguments[2])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -272,10 +369,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b110],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] | UInt32(core.arguments[2])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -286,10 +383,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b111],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] & UInt32(core.arguments[2])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -322,10 +419,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b011],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (core.registerFile[Int(core.arguments[1])] < UInt32(core.arguments[2]) ? 1 : 0)
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -358,13 +455,13 @@ extension InstructionSet
             constants: ["opcode": 0b0000011, "funct3": 0b000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
                     core.registerFile[Int(core.arguments[0])] = UInt32(truncatingBitPattern: Utils.signExt(UInt(bytes[0]), bits: 8))
-                    core.programCounter += 4    
+                        
                 }
                 catch
                 {
@@ -380,13 +477,13 @@ extension InstructionSet
             constants: ["opcode": 0b0000011, "funct3": 0b001],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
-                    core.programCounter += 4                    
+                                        
                     
                 }
                 catch 
@@ -402,13 +499,13 @@ extension InstructionSet
             constants: ["opcode": 0b0000011, "funct3": 0b010],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 4)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
-                    core.programCounter += 4
+                    
                     
                 }
                 catch 
@@ -424,13 +521,13 @@ extension InstructionSet
             constants: ["opcode": 0b0000011, "funct3": 0b100],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
                     core.registerFile[Int(core.arguments[0])] = UInt32(bytes[0])
-                    core.programCounter += 4
+                    
                     
                 }
                 catch
@@ -447,13 +544,13 @@ extension InstructionSet
             constants: ["opcode": 0b0000011, "funct3": 0b101],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 do
                 {
                     let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
-                    core.programCounter += 4
+                    
                     
                 }
                 catch
@@ -493,10 +590,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b001, "funct7": 0b0000000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << UInt32(core.arguments[2])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -507,10 +604,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b101, "funct7": 0b0000000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> UInt32(core.arguments[2])
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -521,10 +618,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010011, "funct3": 0b101, "funct7": 0b0100000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: UInt32(core.arguments[2])))
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -559,8 +656,8 @@ extension InstructionSet
             constants: ["opcode": 0b0100011, "funct3": 0b000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 var bytes = [UInt8]()
                 bytes.append(UInt8(core.registerFile[Int(core.arguments[0])] & 255))
                 do
@@ -571,7 +668,7 @@ extension InstructionSet
                 {
                     throw error
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -582,8 +679,8 @@ extension InstructionSet
             constants: ["opcode": 0b0100011, "funct3": 0b001],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 var bytes = [UInt8]()
                 var value = core.registerFile[Int(core.arguments[0])]
                 bytes.append(UInt8(value & 255))
@@ -597,7 +694,7 @@ extension InstructionSet
                 {
                     throw error
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -608,8 +705,8 @@ extension InstructionSet
             constants: ["opcode": 0b0100011, "funct3": 0b010],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 var bytes = [UInt8]()
                 var value = core.registerFile[Int(core.arguments[0])]
                 bytes.append(UInt8(value & 255))
@@ -627,7 +724,7 @@ extension InstructionSet
                 {
                     throw error
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -660,10 +757,10 @@ extension InstructionSet
             constants: ["opcode": 0b0110111],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.arguments[1] << 12)
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -674,10 +771,10 @@ extension InstructionSet
             constants: ["opcode": 0b0010111],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.arguments[1] << 12) + (core.programCounter)
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -795,14 +892,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b000],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if core.registerFile[Int(core.arguments[0])] == core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
                     return
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -813,14 +910,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b001],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if core.registerFile[Int(core.arguments[0])] != core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
                     return
                 }
-                core.programCounter += 4
+                
             }
         ))
        
@@ -830,14 +927,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b100],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
                     return
                 }
-                core.programCounter += 4
+                
                 return
             }
         ))
@@ -848,14 +945,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b101],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if Int32(bitPattern: core.registerFile[Int(core.arguments[0])]) >= Int32(bitPattern: core.registerFile[Int(core.arguments[1])])
                 {
                     core.programCounter += UInt32(core.arguments[2])
                     return
                 }
-                core.programCounter += 4
+                
             }
         ))
        
@@ -865,14 +962,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b110],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if core.registerFile[Int(core.arguments[0])] < core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
                     return
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -883,14 +980,14 @@ extension InstructionSet
             constants: ["opcode": 0b1100011, "funct3": 0b111],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 if core.registerFile[Int(core.arguments[0])] >= core.registerFile[Int(core.arguments[1])]
                 {
                     core.programCounter += UInt32(core.arguments[2])
                     return
                 }
-                core.programCounter += 4
+                
                 
             }
         ))
@@ -1005,8 +1102,8 @@ extension InstructionSet
             constants: ["opcode": 0b1101111],
             executor:
             {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
+                (mips: Core) in
+                let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.programCounter + 4
                 core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[1]))
                 
@@ -1037,10 +1134,10 @@ extension InstructionSet
                 constants: ["const": 0b00000000000000000000000001110011],
                 executor:
                 {
-                    (rv32i: Core) in
-                    let core = rv32i as! RV32iCore
+                    (mips: Core) in
+                    let core = mips as! MIPSCore
                     core.state = .environmentCall
-                    core.programCounter += 4
+                    
                     
                 }
                
@@ -1126,7 +1223,7 @@ public class MIPSCore: Core
     public var instructionSet: InstructionSet
 
     //Registers
-    public var registerFile: RV32iRegisterFile
+    public var registerFile: MIPSRegisterFile
 
     //Memory
     public var memory: Memory
@@ -1220,14 +1317,14 @@ public class MIPSCore: Core
 
     public init?(memorySize: Int = 4096)
     {
-        guard let RV32i = InstructionSet.RV32i
+        guard let MIPS = InstructionSet.MIPS
         else
         {
             return nil
         }
         self.programCounter = 0
-        self.instructionSet = RV32i
-        self.registerFile = RV32iRegisterFile(memorySize: memorySize)
+        self.instructionSet = MIPS
+        self.registerFile = MIPSRegisterFile(memorySize: memorySize)
         self.memory = SimpleMemory(memorySize)
         self.fetched = 0
         self.state = .idle

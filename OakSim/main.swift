@@ -9,7 +9,7 @@ extension Array
     {
         for (i, element) in self.enumerated()
         {
-            Swift.print(i, element)
+            Swift.print(element)
         }
     }
 }
@@ -134,6 +134,8 @@ let command = Command(
         case "armv7":
             print("ARMv7 not yet implemented.")
             return
+        case "mips":
+            coreChoice = MIPSCore()
         default:
             return
     }
@@ -229,7 +231,7 @@ let command = Command(
 
                     if timer.counter == (1 << 14)
                     {
-                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
+                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 10) instructions and may be an infinite loop. You may want to interrupt the program.")
                     }
                     try core.execute()
                 }

@@ -1204,7 +1204,7 @@ public class RV32iCore: Core
         return UInt(programCounter)
     }
 
-    public init?(memorySize: Int = 4096)
+    public init?(memorySize: Int = 66666)
     {
         guard let RV32i = InstructionSet.RV32i
         else

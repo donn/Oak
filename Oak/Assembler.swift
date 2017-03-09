@@ -42,6 +42,7 @@ public class Assembler
     private var keywordRegexes: [Keyword: String]
     private var directives: [String: Directive]
     private var endianness: Endianness?
+    private var incrementOnFetch: Bool
 
    
     /*
@@ -534,6 +535,11 @@ public class Assembler
                         errorMessages.append(message)
                         continue
                     }
+
+                    if (incrementOnFetch)
+                    {
+                        address += UInt(instruction.bytes)
+                    }
                     
                     let format = instruction.format
                     let bitRanges = format.ranges
@@ -549,8 +555,6 @@ public class Assembler
                     }
                     captures.removeFirst()
                     
-                    
-
                     for (i, range) in bitRanges.enumerated()
                     {
                         if let parameter = range.parameter
@@ -639,8 +643,10 @@ public class Assembler
                             code = code >> 8
                         }
                     }
-
-                    address += UInt(instruction.bytes)
+                    if (!incrementOnFetch)
+                    {
+                        address += UInt(instruction.bytes)
+                    }
                 }
             }
             else
@@ -883,6 +889,7 @@ public class Assembler
     */
     public init(for instructionSet: InstructionSet, endianness: Endianness? = nil)
     {
+        incrementOnFetch = instructionSet.incrementOnFetch
         if let regexes = instructionSet.keywordRegexes 
         {
             self.keywordRegexes = regexes

@@ -3,12 +3,15 @@ import Foundation
 public class Regex
 {
     var regex: NSRegularExpression
+    var pattern: String
+
     
     public init?(_ pattern: String)
     {
         //Notice: Error handling does not work on Linux. So you better be sure they're right.
         do
         {
+            self.pattern = pattern
             self.regex = try NSRegularExpression(pattern: pattern, options: [])
         }
         catch
@@ -137,3 +140,6 @@ public class Regex
         return array
     }
 }
+
+// let rx = Regex("[a-zA-Z]+\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$?([A-Za-z0-9]+)")!
+// print(rx.captures(in: "add $s0, $zero, $sp"))

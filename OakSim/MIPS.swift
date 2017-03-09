@@ -23,7 +23,7 @@ extension InstructionSet
                     BitRange("rs", condition: { 0...7 ~= ($0 & 63) }, at: 21, bits: 5, parameter: 2, parameterType: .register),
                     BitRange("shamt", condition: { !(0...7 ~= ($0 & 63)) }, at: 6, bits: 5, parameter: 0, parameterType: .immediate)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)")!,
+                regex: Regex("[a-zA-Z]+\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$?([A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )

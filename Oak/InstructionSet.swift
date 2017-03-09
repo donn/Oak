@@ -224,7 +224,7 @@ public class PseudoInstruction
 }
 
 public class InstructionSet
-{          
+{
     private var formats: [Format]
     
     private var instructions: [Instruction]
@@ -248,6 +248,9 @@ public class InstructionSet
     public var keywordRegexes: [Keyword: String]?
     public var keywords: [Keyword: [String]]?
     public var directives: [String: Directive]
+
+    //Assembly Conventions
+    public var incrementOnFetch: Bool
 
     //Instruction Fetcher Functions
     public func instruction(matching: UInt) -> Instruction?
@@ -319,7 +322,8 @@ public class InstructionSet
         endianness: Endianness = .little,
         keywordRegexes: [Keyword: String]? = nil,
         keywords: [Keyword: [String]]? = nil, 
-        directives: [String: Directive] = [:]
+        directives: [String: Directive] = [:],
+        incrementOnFetch: Bool = true
     )
     {
         self.bits = bits
@@ -331,6 +335,7 @@ public class InstructionSet
         self.keywordRegexes = keywordRegexes
         self.keywords = keywords
         self.directives = directives
+        self.incrementOnFetch = incrementOnFetch
     }
 
       

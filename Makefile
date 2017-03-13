@@ -1,4 +1,11 @@
-Name = Oak
+Name := Oak
+
+UNAME := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+	InstallDir := /usr/local/bin
+else
+	InstallDir := ~/bin/
+endif
 
 all:
 	@swift build  -c release
@@ -9,7 +16,9 @@ debug:
 	@cp ./.build/debug/OakSim ./.build/oak
 
 install:
-	@cp ./.build/oak ~/bin/oak
+	@mkdir -p ~/bin/
+	echo $(InstallDir)
+	@cp ./.build/oak $(InstallDir)
 
 clean:
 	@rm -rf .build/

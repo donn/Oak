@@ -7,9 +7,9 @@ extension Array
 {
     public func print()
     {
-        for (i, element) in self.enumerated()
+        for element in self
         {
-            Swift.print(i, element)
+            Swift.print(element)
         }
     }
 }

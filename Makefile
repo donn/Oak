@@ -16,8 +16,7 @@ debug:
 	@cp ./.build/debug/OakSim ./.build/oak
 
 install:
-	@mkdir -p ~/bin/
-	echo $(InstallDir)
+	@mkdir -p $(InstallDir)
 	@cp ./.build/oak $(InstallDir)
 
 clean:

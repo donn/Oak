@@ -46,6 +46,7 @@ public protocol Core
         
     func fetch() throws
     func loadProgram(machineCode: [UInt8]) throws
+    func registerDump() -> String
 }
 
 extension Core

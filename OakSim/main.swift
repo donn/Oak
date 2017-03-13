@@ -88,7 +88,8 @@ let command = Command(
         Flag(shortName: "v", longName: "version", value: false, description: "Prints the current version."),
         Flag(shortName: "a", longName: "arch", value: "rv32i", description: "Picks the instruction set architecture."),
         Flag(shortName: "s", longName: "simulate", value: false, description: "Simulate only. The arguments will be treated as binary files."),
-        Flag(shortName: "d", longName: "debug", value: false, description: "Debug while simulating. Prints disassembly, allows for step-by-step execution.")
+        Flag(shortName: "d", longName: "disassemble", value: false, description: "Disassemble while simulating."),
+        Flag(shortName: "i", longName: "interactive", value: false, description: "Interactive debugging mode.")
         
     ]
 )
@@ -103,7 +104,7 @@ let command = Command(
         return
     }
 
-    var debug = flags.getBool(name: "debug") ?? false
+    var disassemble = flags.getBool(name: "disassemble") ?? false
     var isaChoice: String = "rv32i"
     if let arch = flags.getString(name: "arch"), !arch.isEmpty
     {
@@ -124,6 +125,8 @@ let command = Command(
         print("Error: --simulate and --output are mutually exclusive.")
         return
     }
+
+    var interactive = flags.getBool(name: "interactive") ?? false
 
     var coreChoice: Core?
 
@@ -218,9 +221,26 @@ let command = Command(
             {
                 do
                 {
+                    if (interactive)
+                    {
+                        var exit = false;
+                        while (!exit)
+                        {
+                            print("Program Counter: 0x\(Utils.pad(core.pc, digits: 8, radix: 16)) > ", terminator: "")
+                            let input = readLine()
+                            if (input == "r")
+                            {
+                                print(core.registerDump())
+                            }
+                            if (input == "")
+                            {
+                                exit = true
+                            }
+                        }
+                    }
                     try core.fetch()
                     let disassembly = try core.decode()
-                    if debug
+                    if disassemble
                     {
                         print(core.pc, disassembly)
                         //print((core as! RV32iCore).registerDump())

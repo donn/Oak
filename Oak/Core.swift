@@ -84,10 +84,9 @@ extension Core
                 
                 fields[parameter] = range.field
                 
-                if let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
+                if range.totalBits != nil
                 {
-                    fields[parameter] = limits[1]
-                    limit = Int(limits[3])!
+                    limit = range.limitStart!
                 }
 
                 rawValues[parameter] |= ((self.fetched >> UInt(range.start)) & ((1 << UInt(range.bits)) - 1)) << UInt(limit)

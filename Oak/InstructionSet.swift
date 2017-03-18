@@ -24,10 +24,15 @@ public class BitRange
     public var field: String
     public var start: Int
     public var bits: Int
-    public var totalBits: Int? //If the immediate is mangled in any form, also save the post-mangling length
+
+    public var totalBits: Int?
+    public var limitStart: Int?
+    public var limitEnd: Int?
+
     public var parameter: Int?
-    public var parameterDefaultValue: UInt? //Ignored if not a parameter. If the parameter is optional, it will default to this value
-    public var parameterType: Parameter? //Ignored if not a parameter
+    public var parameterDefaultValue: UInt? //If the parameter is optional, it will default to this value
+    public var parameterType: Parameter?
+
     public var signExtended: Bool
 
     public var end: Int
@@ -35,12 +40,14 @@ public class BitRange
         return start + bits - 1
     }      
     
-    public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
+    public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
         self.start = start
         self.bits = bits
         self.totalBits = totalBits
+        self.limitStart = limitStart
+        self.limitEnd = limitEnd
         self.parameter = parameter
         self.parameterType = parameterType
         self.parameterDefaultValue = nil

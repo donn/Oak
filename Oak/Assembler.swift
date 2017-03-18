@@ -554,18 +554,13 @@ public class Assembler
                     for range in bitRanges
                     {
                         if let parameter = range.parameter
-                        {    
-                            var startBit = 0
-                            var endBit: Int?
+                        {
                             var bits = range.bits
                             var field = range.field
 
-                            let limits = Regex("([A-za-z]+)\\s*\\[\\s*(\\d+)\\s*:\\s*(\\d+)\\s*\\]")!.captures(in: range.field)
-
-                            if let limited = limits 
+                            if let limited = range.totalBits
                             {
-                                field = limited[1]
-                                bits = range.totalBits!
+                                bits = limited
                             }                
                             
                             var register: UInt = 0
@@ -608,14 +603,11 @@ public class Assembler
                                 }
                                 register = processed.value
                             }
-                            
-                            if let limited = limits
+
+                            if let limited = range.totalBits, let startBit = range.limitStart, let endBit = range.limitEnd
                             {
-                                startBit = Int(limited[3])!
-                                endBit = Int(limited[2])!
-                                
                                 register = register >> UInt(startBit)
-                                register = register & ((1 << (UInt(endBit!) - UInt(startBit) + 1)) - 1)
+                                register = register & ((1 << (UInt(endBit) - UInt(startBit) + 1)) - 1)
                             }
                             
                             code = code | register << UInt(range.start)

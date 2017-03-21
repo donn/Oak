@@ -27,7 +27,7 @@ public class BitRange
     public var bits: Int
     public var totalBits: Int? //If the immediate is mangled in any form, also save the post-mangling length
     public var parameter: Int?
-    public var parameterDefaultValue: UInt? //Ignored if not a parameter. If the parameter is optional, it will default to this value
+    public var parameterDefaultValue: UInt? //Ignored if not a parameter. If the parameter is conditional, it will default to this value.
     public var parameterType: Parameter? //Ignored if not a parameter
     public var signExtended: Bool
 
@@ -45,7 +45,7 @@ public class BitRange
         self.totalBits = totalBits
         self.parameter = parameter
         self.parameterType = parameterType
-        self.parameterDefaultValue = nil
+        self.parameterDefaultValue = parameterDefaultValue
         self.signExtended = signExtended
     }
 }
@@ -77,7 +77,6 @@ public class Instruction
     public var constants: [String: UInt]
     public var available: Bool
     public var execute: (Core) throws -> ()
-    public var ignoredFields: [String]
     
     /*
      Mask
@@ -203,7 +202,7 @@ public class Instruction
      template: Optional. See "computedTemplate".
     */
 
-    public init(_ mnemonic: String, format: Format, constants: [String: UInt], executor execute: @escaping (Core) throws -> (), available: Bool = true, mask precomputedMask: String? = nil, template precomputedTemplate: UInt? = nil, ignoredFields: [String] = [])
+    public init(_ mnemonic: String, format: Format, constants: [String: UInt], executor execute: @escaping (Core) throws -> (), available: Bool = true, mask precomputedMask: String? = nil, template precomputedTemplate: UInt? = nil)
     {
         self.mnemonic = mnemonic
         self.format = format
@@ -212,7 +211,6 @@ public class Instruction
         self.computedMask = precomputedMask
         self.computedTemplate = precomputedTemplate
         self.execute = execute
-        self.ignoredFields = ignoredFields
     }
     
 }

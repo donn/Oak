@@ -17,13 +17,13 @@ extension InstructionSet
                 ranges:
                 [
                     BitRange("opcode", at: 26, bits: 6),
-                    BitRange("rt", at: 16, bits: 5, parameter: 1, parameterType: .register),
+                    BitRange("rs", at: 21, bits: 5, parameter: 1, parameterType: .register),
                     BitRange("rd", at: 11, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("funct", at: 0, bits: 6),
-                    BitRange("rs", condition: { 0...7 ~= ($0 & 63) }, at: 21, bits: 5, parameter: 2, parameterType: .register),
-                    BitRange("shamt", condition: { !(0...7 ~= ($0 & 63)) }, at: 6, bits: 5, parameter: 0, parameterType: .immediate)
+                    BitRange("rt", condition: { !(0...7 ~= ($0 & 63)) }, at: 16, bits: 5, parameter: 2, parameterType: .register, parameterDefaultValue: 0),
+                    BitRange("shamt", condition: { 0...7 ~= ($0 & 63) }, at: 6, bits: 5, parameter: 2, parameterType: .immediate, parameterDefaultValue: 0)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$([A-Za-z0-9]+)\\s*,\\s*\\$?([A-Za-z0-9]+)")!,
+                regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -272,8 +272,39 @@ extension InstructionSet
                 
             }
         ))
+        //All-Const Subtype
+        formats.append(
+            Format(
+                ranges: [
+                    BitRange("const", at: 0, bits: 32)
+                ],
+                regex: Regex("[a-zA-Z]+")!,
+                disassembly: "@mnem"
+            )
+        )
+       
+        guard let allConstSubtype = formats.last
+        else
+        {
+            return nil
+        }
+
+        instructions.append(Instruction(
+                "SYSCALL",
+                format: allConstSubtype,
+                constants: ["const": 0xc],
+                executor:
+                {
+                    (rv32i: Core) in
+                    let core = rv32i as! RV32iCore
+                    core.state = .environmentCall
+                    core.programCounter += 4
+                    
+                }               
+            )
+        )
         
-        let abiNames = ["$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$fp", "$ra"]
+        let abiNames = ["$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"]
 
         let keywords: [Keyword: [String]] = [
             .directive: ["\\."],

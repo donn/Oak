@@ -130,8 +130,10 @@ let command = Command(
 
     var coreChoice: Core?
 
-    switch(isaChoice)
+    switch(isaChoice.lowercased())
     {
+        case "riscv":
+            fallthrough
         case "rv32i":
             coreChoice = RV32iCore()
         case "armv7":

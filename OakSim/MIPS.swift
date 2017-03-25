@@ -312,7 +312,7 @@ extension InstructionSet
             .label: ["\\:"],
             .stringMarker: ["\\\""],
             .charMarker: ["\\\'"],
-            .register: ["$"]
+            .register: ["\\$"]
         ]
 
         let directives: [String: Directive] = [

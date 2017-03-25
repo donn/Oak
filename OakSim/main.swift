@@ -76,7 +76,7 @@ signal(SIGINT)
         print("")
         timer.stop()
         timer.print()
-        exit(0)
+        exit(9)
     }
 }
 
@@ -123,7 +123,7 @@ let command = Command(
     if assembleOnly && simulateOnly
     {
         print("Error: --simulate and --output are mutually exclusive.")
-        return
+        exit(64)
     }
 
     var interactive = flags.getBool(name: "interactive") ?? false
@@ -138,10 +138,11 @@ let command = Command(
             coreChoice = RV32iCore()
         case "armv7":
             print("ARMv7 not yet implemented.")
-            return
+            exit(64)
         case "mips":
             coreChoice = MIPSCore()
         default:
+            //Not possible.
             return
     }
 
@@ -150,14 +151,14 @@ let command = Command(
     if arguments.count != 1
     {
         print("Error: Oak needs at least/at most one file.")
-        return
+        exit(64)
     }
 
     guard let defile = Defile(arguments[0], mode: .read)
     else
     {
         print("Error: Opening file \(arguments[0]) failed.")
-        return
+        exit(66)
     }
 
     if simulateOnly
@@ -175,7 +176,7 @@ let command = Command(
         if lexed.errorMessages.count != 0
         {
             lexed.errorMessages.print()
-            return
+            exit(0xBAD)
         }
 
         let assembled = assembler.assemble(lexed.lines, labels: lexed.labels)
@@ -183,7 +184,7 @@ let command = Command(
         if assembled.errorMessages.count != 0
         {
             assembled.errorMessages.print()
-            return
+            exit(0xBAD)
         }
 
         machineCode = assembled.machineCode
@@ -196,7 +197,7 @@ let command = Command(
         else
         {
             print("Error: Opening file \(binPath) for writing failed.")
-            return
+            exit(73)
         }
 
         do
@@ -204,6 +205,7 @@ let command = Command(
             try defile.write(bytes:machineCode)
         } catch {
             print("\(error)")
+            exit(73)
         }
     }
     else
@@ -215,7 +217,7 @@ let command = Command(
         catch
         {
             print("Error while loading program: \(error).")
-            return
+            exit(65)
         }
 
         timer.reset()
@@ -262,7 +264,7 @@ let command = Command(
                     print("Error: \(error).")
                     timer.stop()
                     timer.print()
-                    return
+                    exit(0xBAD)
                 } 
             }
 

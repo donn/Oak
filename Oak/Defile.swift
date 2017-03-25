@@ -31,8 +31,8 @@ extension String
 
 public class Defile
 {
-    private var file: UnsafeMutablePointer<FILE>!
-    private var mode: DefileModes!
+    private var file: UnsafeMutablePointer<FILE>
+    private var mode: DefileModes
     var endOfFile: Bool
     {
        return feof(file) == 0
@@ -52,7 +52,7 @@ public class Defile
     */
     public init?(_ path: String, mode: DefileModes)
     {
-        var modeStr: String!
+        var modeStr: String
         
         switch(mode)
         {
@@ -64,13 +64,13 @@ public class Defile
                 modeStr = "a"
         }
         
-        self.file = fopen(path, modeStr)
-        
-        if self.file == nil
+        guard let file = fopen(path, modeStr)
+        else
         {
             return nil
         }
-        
+
+        self.file = file        
         self.mode = mode
     }
 

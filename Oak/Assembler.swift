@@ -66,7 +66,8 @@ public class Assembler
                     value = UInt(index)
                     return (errorMessage, value)
                 }
-                guard let regex = keywordRegexes[.register], let registerExtract = Regex(regex)!.captures(in: text), let registerNo = UInt( registerExtract[1])
+                
+                guard let regex = keywordRegexes[.register], let registerExtract = Regex(regex)!.captures(in: text), let registerNo = UInt(registerExtract[1])
                 else
                 {
                     errorMessage = "Register \(text) does not exist."
@@ -478,7 +479,6 @@ public class Assembler
         var skipLine = false
         assembling: for (i, line) in lines.enumerated()
         {
-            print(i)
             skipLine = false
 
             guard let words = Regex("[^\\s]+")!.matches(in: line)

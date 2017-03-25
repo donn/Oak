@@ -17,7 +17,6 @@ debug:
 
 install:
 	@mkdir -p ~/bin/
-	echo $(InstallDir)
 	@cp ./.build/oak $(InstallDir)
 
 clean:

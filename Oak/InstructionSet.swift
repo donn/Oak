@@ -40,7 +40,7 @@ public class BitRange
         return start + bits - 1
     }
   
-    public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
+    public init(_ field: String, condition: ((UInt) -> (Bool))? = nil, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
         self.condition = condition

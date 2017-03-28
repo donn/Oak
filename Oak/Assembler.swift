@@ -42,6 +42,7 @@ public class Assembler
     private var keywordRegexes: [Keyword: String]
     private var directives: [String: Directive]
     private var endianness: Endianness?
+    private var incrementOnFetch: Bool
 
    
     /*
@@ -65,7 +66,8 @@ public class Assembler
                     value = UInt(index)
                     return (errorMessage, value)
                 }
-                guard let regex = keywordRegexes[.register], let registerExtract = Regex(regex)!.captures(in: text), let registerNo = UInt( registerExtract[1])
+                
+                guard let regex = keywordRegexes[.register], let registerExtract = Regex(regex)!.captures(in: text), let registerNo = UInt(registerExtract[1])
                 else
                 {
                     errorMessage = "Register \(text) does not exist."
@@ -475,7 +477,7 @@ public class Assembler
         var text = true
 
         var skipLine = false
-        for (i, line) in lines.enumerated()
+        assembling: for (i, line) in lines.enumerated()
         {
             skipLine = false
 
@@ -534,6 +536,11 @@ public class Assembler
                         errorMessages.append(message)
                         continue
                     }
+
+                    if (incrementOnFetch)
+                    {
+                        address += UInt(instruction.bytes)
+                    }
                     
                     let format = instruction.format
                     let bitRanges = format.ranges
@@ -549,9 +556,7 @@ public class Assembler
                     }
                     captures.removeFirst()
                     
-                    
-
-                    for range in bitRanges
+                    for (j, range) in bitRanges.enumerated()
                     {
                         if let parameter = range.parameter
                         {
@@ -565,43 +570,57 @@ public class Assembler
                             
                             var register: UInt = 0
                             
-                            if range.parameterType == .special
+                            if let check = range.condition, !check(code)
                             {
-                                guard let specialProcess = instruction.format.processSpecialParameter[field]
+                                guard let defaultValue = range.parameterDefaultValue
                                 else
                                 {
-                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Special parameter '\(field)' missing parameter processor."
+                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Parameter '\(field)' is conditional, missing default value."
                                     errorMessages = [message]
                                     return (errorMessages, machineCode)
                                 }
-                                let processed = specialProcess(captures[parameter], address, bits, labels)
-                                if let error = processed.errorMessage
-                                {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
-                                    errorMessages.append(message)
-                                    skipLine = true
-                                    continue
-                                }
-                                register = processed.value
+                                register = defaultValue
                             }
                             else
                             {
-                                guard let type = range.parameterType
+                                if range.parameterType == .special
+                                {
+                                    guard let specialProcess = instruction.format.processSpecialParameter[field]
+                                    else
+                                    {
+                                        let message = "\("Instruction Set Error:".blue.bold) Line \(i): Special parameter '\(field)' missing parameter processor."
+                                        errorMessages = [message]
+                                        return (errorMessages, machineCode)
+                                    }
+                                    let processed = specialProcess(captures[parameter], address, bits, labels)
+                                    if let error = processed.errorMessage
+                                    {
+                                        let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
+                                        errorMessages.append(message)
+                                        skipLine = true
+                                        continue
+                                    }
+                                    register = processed.value
+                                }
                                 else
                                 {
-                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Parameter '\(field)' missing parameter type."
-                                    errorMessages = [message]
-                                    return (errorMessages, machineCode)
+                                    guard let type = range.parameterType
+                                    else
+                                    {
+                                        let message = "\("Instruction Set Error:".blue.bold) Line \(i): Parameter '\(field)' missing parameter type."
+                                        errorMessages = [message]
+                                        return (errorMessages, machineCode)
+                                    }
+                                    let processed = process(captures[parameter], address: address, type: type, bits: bits, labels: labels)
+                                    if let error = processed.errorMessage
+                                    {
+                                        let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
+                                        errorMessages.append(message)
+                                        skipLine = true
+                                        continue
+                                    }
+                                    register = processed.value
                                 }
-                                let processed = process(captures[parameter], address: address, type: type, bits: bits, labels: labels)
-                                if let error = processed.errorMessage
-                                {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
-                                    errorMessages.append(message)
-                                    skipLine = true
-                                    continue
-                                }
-                                register = processed.value
                             }
 
                             if let limited = range.totalBits, let startBit = range.limitStart, let endBit = range.limitEnd
@@ -631,8 +650,10 @@ public class Assembler
                             code = code >> 8
                         }
                     }
-
-                    address += UInt(instruction.bytes)
+                    if (!incrementOnFetch)
+                    {
+                        address += UInt(instruction.bytes)
+                    }
                 }
             }
             else
@@ -875,6 +896,7 @@ public class Assembler
     */
     public init(for instructionSet: InstructionSet, endianness: Endianness? = nil)
     {
+        incrementOnFetch = instructionSet.incrementOnFetch
         if let regexes = instructionSet.keywordRegexes 
         {
             self.keywordRegexes = regexes

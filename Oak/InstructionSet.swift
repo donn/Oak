@@ -22,6 +22,7 @@ public enum AssemblyError: Error
 public class BitRange
 {
     public var field: String
+    public var condition: ((UInt) -> (Bool))?
     public var start: Int
     public var bits: Int
 
@@ -32,17 +33,17 @@ public class BitRange
     public var parameter: Int?
     public var parameterDefaultValue: UInt? //If the parameter is optional, it will default to this value
     public var parameterType: Parameter?
-
     public var signExtended: Bool
 
     public var end: Int
     {
         return start + bits - 1
-    }      
-    
+    }
+  
     public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
+        self.condition = condition
         self.start = start
         self.bits = bits
         self.totalBits = totalBits
@@ -50,7 +51,7 @@ public class BitRange
         self.limitEnd = limitEnd
         self.parameter = parameter
         self.parameterType = parameterType
-        self.parameterDefaultValue = nil
+        self.parameterDefaultValue = parameterDefaultValue
         self.signExtended = signExtended
     }
 }
@@ -90,6 +91,7 @@ public class Instruction
      Example, if this 8-bit ISA defines 5 bits for the register and 3 bits for the opcode, and the opcode for ADD is 101
      then the ADD instruction's mask is XXXXX101.
     */
+    //TO-DO: This is broken for MIPS, as the BitRanges are not in order. Replace with more flexible algorithm (rip performance).
     var computedMask: String? //Used in a dynamic programming-y way. You can also precompute it if you're sure of the ISA's final design to skip the computation.
     var mask: String
     {
@@ -227,7 +229,7 @@ public class PseudoInstruction
 }
 
 public class InstructionSet
-{          
+{
     private var formats: [Format]
     
     private var instructions: [Instruction]
@@ -251,6 +253,9 @@ public class InstructionSet
     public var keywordRegexes: [Keyword: String]?
     public var keywords: [Keyword: [String]]?
     public var directives: [String: Directive]
+
+    //Assembly Conventions
+    public var incrementOnFetch: Bool
 
     //Instruction Fetcher Functions
     public func instruction(matching: UInt) -> Instruction?
@@ -322,7 +327,8 @@ public class InstructionSet
         endianness: Endianness = .little,
         keywordRegexes: [Keyword: String]? = nil,
         keywords: [Keyword: [String]]? = nil, 
-        directives: [String: Directive] = [:]
+        directives: [String: Directive] = [:],
+        incrementOnFetch: Bool = true
     )
     {
         self.bits = bits
@@ -334,6 +340,7 @@ public class InstructionSet
         self.keywordRegexes = keywordRegexes
         self.keywords = keywords
         self.directives = directives
+        self.incrementOnFetch = incrementOnFetch
     }
 
       

@@ -1053,7 +1053,7 @@ extension InstructionSet
             "word": ._32bit
         ]
        
-        return InstructionSet(bits: 32, formats: formats, instructions: instructions, abiNames: abiNames, keywords: keywords, directives: directives)
+        return InstructionSet(bits: 32, formats: formats, instructions: instructions, abiNames: abiNames, keywords: keywords, directives: directives, incrementOnFetch: false)
 
     }
     
@@ -1204,7 +1204,7 @@ public class RV32iCore: Core
         return UInt(programCounter)
     }
 
-    public init?(memorySize: Int = 4096)
+    public init?(memorySize: Int = 8192)
     {
         guard let RV32i = InstructionSet.RV32i
         else

@@ -521,11 +521,11 @@ extension InstructionSet
             Format(
                 ranges:
                 [
-                    BitRange("imm[11:5]", at: 25, bits: 7, totalBits: 12, parameter: 1, parameterType: .immediate),
+                    BitRange("imm", at: 25, bits: 7, totalBits: 12, limitStart: 5, limitEnd: 11, parameter: 1, parameterType: .immediate),
                     BitRange("rs2", at: 20, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("rs1", at: 15, bits: 5, parameter: 2, parameterType: .register),
                     BitRange("funct3", at: 12, bits: 3),
-                    BitRange("imm[4:0]", at: 7, bits: 5, totalBits: 12, parameter: 1, parameterType: .immediate),
+                    BitRange("imm", at: 7, bits: 5, totalBits: 12, limitStart: 0, limitEnd: 4, parameter: 1, parameterType: .immediate),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
@@ -672,11 +672,11 @@ extension InstructionSet
         formats.append(
             Format(
                 ranges: [
-                    BitRange("imm[11:5]", at: 25, bits: 7, totalBits: 13, parameter: 2, parameterType: .special),
+                    BitRange("imm", at: 25, bits: 7, totalBits: 13, limitStart: 5, limitEnd: 11, parameter: 2, parameterType: .special),
                     BitRange("rs2", at: 20, bits: 5, parameter: 1, parameterType: .register),
                     BitRange("rs1", at: 15, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("funct3", at: 12, bits: 3),
-                    BitRange("imm[4:0]", at: 7, bits: 5, totalBits: 13, parameter: 2, parameterType: .special),
+                    BitRange("imm", at: 7, bits: 5, totalBits: 13, limitStart: 0, limitEnd: 4, parameter: 2, parameterType: .special),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
@@ -885,7 +885,7 @@ extension InstructionSet
         formats.append(
             Format(
                 ranges: [
-                    BitRange("imm", at: 12, bits: 20, totalBits: 21, parameter: 1, parameterType: .special),
+                    BitRange("imm", at: 12, bits: 20, parameter: 1, parameterType: .special),
                     BitRange("rd", at: 7, bits: 5,  parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],

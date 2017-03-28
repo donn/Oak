@@ -11,7 +11,7 @@ The ultimate aim for this project is to have a terminal and later GUI app to pra
 While designed for ARM initially, as one of [Oak.js](https://github.com/skyus/Oak.js) requirements was RISC-V, Oak's backport currently supports RISC-V, but ARM should be coming soon enough.
 
 # Requirements
-Swift 3.1-dev (Jan 28th Snapshot or later). Supported on both macOS and Linux.
+Swift 3.0 on macOS, Swift 3.1 on Linux.
 
 # Usage
 ## Unix

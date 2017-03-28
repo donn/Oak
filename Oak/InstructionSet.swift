@@ -85,6 +85,7 @@ public class Instruction
      Example, if this 8-bit ISA defines 5 bits for the register and 3 bits for the opcode, and the opcode for ADD is 101
      then the ADD instruction's mask is XXXXX101.
     */
+    //TO-DO: This is broken for MIPS, as the BitRanges are not in order. Replace with more flexible algorithm (rip performance).
     var computedMask: String? //Used in a dynamic programming-y way. You can also precompute it if you're sure of the ISA's final design to skip the computation.
     var mask: String
     {

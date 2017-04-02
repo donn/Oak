@@ -371,7 +371,7 @@ public class MIPSRegisterFile
     {
         self.file = [UInt32](repeating: 0, count: 31)
         self.memorySize = memorySize
-        self[2] = UInt32(memorySize) //stack pointer
+        self[29] = UInt32(memorySize) //stack pointer
     }
 }
 
@@ -407,12 +407,9 @@ public class MIPSCore: Core
     {
         do
         {
-            var bytes = try self.memory.copy(UInt(programCounter), count: 1)
-            if (bytes[0] & 3) == 3
-            {
-                bytes += try self.memory.copy(UInt(programCounter + 1), count: 3)
-            }
+            var bytes = try self.memory.copy(UInt(programCounter), count: 4)
             self.fetched = Utils.concatenate(bytes: bytes)
+            programCounter += 4
         }
         catch
         {
@@ -451,7 +448,7 @@ public class MIPSCore: Core
         var dump = ""
         for i in 0..<registerFile.count
         {
-            dump += "x\(i) \(instructionSet.abiNames[i]) \(registerFile[i])\n"
+            dump += "$\(i) \(instructionSet.abiNames[i]) \(registerFile[i])\n"
         }
         return dump
     }

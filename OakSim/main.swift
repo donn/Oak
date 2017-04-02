@@ -68,14 +68,22 @@ class ExecutionTimer
 
 var timer = ExecutionTimer(printIPS: true)
 
+var interactive = 0
 signal(SIGINT)
 {
     (s: Int32) in
-    if 2...6 ~= s
+    if (!interactive)
     {
-        print("")
-        timer.stop()
-        timer.print()
+        if 2...6 ~= s
+        {
+            print("")
+            timer.stop()
+            timer.print()
+            exit(9)
+        }
+    }
+    if s == 1
+    {
         exit(9)
     }
 }
@@ -125,8 +133,8 @@ let command = Command(
         print("Error: --simulate and --output are mutually exclusive.")
         exit(64)
     }
-
-    var interactive = flags.getBool(name: "interactive") ?? false
+    
+    interactive = flags.getBool(name: "interactive") ?? false
 
     var coreChoice: Core?
 
@@ -238,7 +246,7 @@ let command = Command(
                             {
                                 print(core.registerDump())
                             }
-                            if (input == "")
+                            else if (input == "c")
                             {
                                 exit = true
                             }

@@ -19,10 +19,17 @@ public enum AssemblyError: Error
     case unhandledOptional
 }
 
+public enum Behavior {
+    case zero
+    case ignore
+    case constant
+}
+
 public class BitRange
 {
     public var field: String
     public var condition: ((UInt) -> (Bool))?
+    public var failBehavior: Behavior
     public var start: Int
     public var bits: Int
 
@@ -40,10 +47,11 @@ public class BitRange
         return start + bits - 1
     }
   
-    public init(_ field: String, condition: ((UInt) -> (Bool))? = nil, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
+    public init(_ field: String, condition: ((UInt) -> (Bool))? = nil, onFailure failBehavior: Behavior = .zero, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
         self.condition = condition
+        self.failBehavior = failBehavior
         self.start = start
         self.bits = bits
         self.totalBits = totalBits
@@ -83,13 +91,45 @@ public class Instruction
     public var constants: [String: UInt]
     public var available: Bool
     public var execute: (Core) throws -> ()
+
+
+
+    /*
+     Bit Count
+     
+     Returns number of bits for a particular instruction.
+    */
+    var computedBits: Int? //See precomputedMask
+    var bits: Int
+    {
+        if let precomputedBits = computedBits
+        {
+            return precomputedBits
+        }
+
+        var count = 0
+        for range in format.ranges
+        {   
+            if range.condition == nil || range.failBehavior != .ignore || range.condition!(template) 
+            {
+                count += range.bits
+            }
+        }
+
+        computedBits = count
+        return computedBits!
+    }
+
+    var bytes: Int
+    {
+        return (bits / 8) + (((bits % 8) > 0) ? 1 : 0)
+    }
     
     /*
      Mask
      
      It's basically the bits of each format, but with Xs replacing parts that aren't constant in every instruction.
-     Example, if this 8-bit ISA defines 5 bits for the register and 3 bits for the opcode, and the opcode for ADD is 101
-     then the ADD instruction's mask is XXXXX101.
+     For example, if an 8-bit ISA defines 5 bits for the register and 3 bits for the opcode, and the opcode for ADD is 101 then the ADD instruction's mask is XXXXX101.
     */
     //TO-DO: This is broken for MIPS, as the BitRanges are not in order. Replace with more flexible algorithm (rip performance).
     var computedMask: String? //Used in a dynamic programming-y way. You can also precompute it if you're sure of the ISA's final design to skip the computation.
@@ -101,20 +141,19 @@ public class Instruction
         }
         
         var string = ""
+        for i in 0..<bits
+        {
+            string += "X"
+        }
+
         for range in self.format.ranges
         {
             if let constant = self.constants[range.field]
             {
-                string += Utils.pad(constant, digits: range.bits, radix: 2)
+                let start = string.index(string.startIndex, offsetBy: bits - range.end - 1)
+                let end = string.index(string.startIndex, offsetBy: bits - range.start - 1)
+                string.replaceSubrange(start...end, with: Utils.pad(constant, digits: range.bits, radix: 2))
             }
-            else
-            {
-                for _ in 0..<range.bits
-                {
-                    string += "X"
-                }
-            }
-        
         }
         self.computedMask = string
         return computedMask!
@@ -148,44 +187,12 @@ public class Instruction
         self.computedTemplate = code
         return computedTemplate!
     }
-
-    /*
-     Bit Count
-     
-     If your ISA is some frankenstein that has the bit length for the same instruction vary, implement the closure. Also raise an issue so we can make the Assembler handle it.
-     This is not used at all in fixed-length ISAs.
-    */
-    var calculateBits: ((String) -> (Int))? //line: String, bitLength: Int
-    var computedBits: Int? //See precomputedMask
-    var bits: Int
-    {
-        if let precomputedBits = computedBits
-        {
-            return precomputedBits
-        }
-
-        var count = 0
-        for range in format.ranges
-        {
-            count += range.bits
-        }
-
-        computedBits = count
-        return computedBits!
-    }
-
-    var bytes: Int
-    {
-        return (bits / 8) + (((bits % 8) > 0) ? 1 : 0)
-    }
     
     func matches(_ machineCode: UInt) -> Bool
     {
         var machineCodeMutable = machineCode
         
-        let characters = self.mask.characters.reversed() 
-        
-        for character in characters
+        for character in self.mask.characters.reversed() 
         {
             if (String(character) != "X" && UInt(String(character)) != (machineCodeMutable & 1))
             {
@@ -306,7 +313,16 @@ public class InstructionSet
         {
             if let parameter = range.parameter
             {
-                output = output.replacingOccurrences(of: "@arg\(parameter)", with: (range.parameterType == .register) ? abiNames[Int(arguments[parameter])] : "\(Int(bitPattern: arguments[parameter]))")
+                if let condition = range.condition, !condition(instruction.template)
+                {
+                    continue
+                }
+                print("@arg\(parameter)")
+                print(abiNames[Int(bitPattern: arguments[parameter])])
+                print(arguments[parameter])
+                print(Int(bitPattern: arguments[parameter]))
+                output = output.replacingOccurrences(of: "@arg\(parameter)", with: (range.parameterType == .register) ? abiNames[Int(bitPattern: arguments[parameter])] : "\(Int(bitPattern: arguments[parameter]))")
+                print(output)
             }      
         }
         return output

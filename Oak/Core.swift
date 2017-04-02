@@ -4,6 +4,7 @@ public enum CoreError: Error
     case unavailableInstruction
     case unrecognizedInstruction
     case isaError
+    case cpuCaughtFire
     case unknownError
 }
 

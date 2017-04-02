@@ -68,13 +68,13 @@ class ExecutionTimer
 
 var timer = ExecutionTimer(printIPS: true)
 
-var interactive = 0
+var interactive = false
 signal(SIGINT)
 {
     (s: Int32) in
     if (!interactive)
     {
-        if 2...6 ~= s
+        if 1...6 ~= s
         {
             print("")
             timer.stop()

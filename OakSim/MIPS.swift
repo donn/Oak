@@ -20,8 +20,8 @@ extension InstructionSet
                     BitRange("rs", at: 21, bits: 5, parameter: 1, parameterType: .register),
                     BitRange("rd", at: 11, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("funct", at: 0, bits: 6),
-                    BitRange("rt", condition: { !(0...7 ~= ($0 & 63)) }, at: 16, bits: 5, parameter: 2, parameterType: .register, parameterDefaultValue: 0),
-                    BitRange("shamt", condition: { 0...7 ~= ($0 & 63) }, at: 6, bits: 5, parameter: 2, parameterType: .immediate, parameterDefaultValue: 0)
+                    BitRange("rt", at: 16, bits: 5, parameter: 2, parameterType: .register),
+                    BitRange("shamt", at: 6, bits: 5, constant: 0)
                 ],
                 regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
@@ -43,8 +43,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) + Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                
-                
             }
         ))
 
@@ -57,8 +55,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                
-                
             }
         ))
 
@@ -71,8 +67,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) - Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                
-                
             }
         ))
        
@@ -85,8 +79,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &- Int32(bitPattern: core.registerFile[Int(core.arguments[2])]))
-                
-                
             }
         ))
        
@@ -99,8 +91,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] & core.registerFile[Int(core.arguments[2])]
-                
-                
             }
         ))
        
@@ -113,8 +103,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] | core.registerFile[Int(core.arguments[2])]
-                
-                
             }
         ))
 
@@ -127,8 +115,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] ^ core.registerFile[Int(core.arguments[2])]
-                
-                
             }
         ))
 
@@ -141,8 +127,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = ~(core.registerFile[Int(core.arguments[1])] | core.registerFile[Int(core.arguments[2])])
-                
-                
             }
         ))
        
@@ -155,8 +139,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) < Int32(bitPattern: core.registerFile[Int(core.arguments[2])])) ? 1 : 0
-                
-                
             }
         ))
        
@@ -169,7 +151,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = (core.registerFile[Int(core.arguments[1])] < core.registerFile[Int(core.arguments[2])]) ? 1 : 0
-                
                 
             },
             available: false
@@ -185,49 +166,6 @@ extension InstructionSet
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> core.registerFile[Int(core.arguments[2])]
                 
-                
-            }
-        ))
-
-        instructions.append(Instruction(
-            "SLL",
-            format: rType,
-            constants: ["opcode": 0x0, "funct": 0x00],
-            executor:
-            {
-                (mips: Core) in
-                let core = mips as! MIPSCore
-                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << UInt32(core.arguments[2])
-                
-                
-            }
-        ))
-
-        instructions.append(Instruction(
-            "SRL",
-            format: rType,
-            constants: ["opcode": 0x0, "funct": 0x02],
-            executor:
-            {
-                (rv32i: Core) in
-                let core = rv32i as! RV32iCore
-                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> UInt32(core.arguments[2])
-                
-                
-            }
-        ))
-       
-        instructions.append(Instruction(
-            "SRA",
-            format: rType,
-            constants: ["opcode": 0x0, "funct": 0x03],
-            executor:
-            {
-                (mips: Core) in
-                let core = mips as! MIPSCore
-                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: UInt32(core.arguments[2])))
-                
-                
             }
         ))
 
@@ -240,8 +178,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << core.registerFile[Int(core.arguments[2])]
-                
-                
             }
         ))        
 
@@ -254,8 +190,6 @@ extension InstructionSet
                 (mips: Core) in
                 let core = mips as! MIPSCore
                 core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> core.registerFile[Int(core.arguments[2])]
-                
-                
             }
         ))
        
@@ -272,6 +206,67 @@ extension InstructionSet
                 
             }
         ))
+
+        //R-Shift Subtype
+        formats.append(
+            Format(
+                ranges:
+                [
+                    BitRange("opcode", at: 26, bits: 6),
+                    BitRange("rs", at: 21, bits: 5, parameter: 1, parameterType: .register),
+                    BitRange("rt", at: 16, bits: 5, constant: 0b00000),
+                    BitRange("rd", at: 11, bits: 5, parameter: 0, parameterType: .register),
+                    BitRange("shamt", at: 6, bits: 5, parameter: 2, parameterType: .immediate),
+                    BitRange("funct", at: 0, bits: 6)
+
+                ],
+                regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
+                disassembly: "@mnem @arg0, @arg1, @arg2"
+            )
+        )
+
+        guard let rsSubtype = formats.last
+        else
+        {
+            return nil
+        }
+        
+        instructions.append(Instruction(
+            "SLL",
+            format: rsSubtype,
+            constants: ["opcode": 0x0, "funct": 0x00], //This means that 0x00000000 is actually an instruction in MIPS32, so I can't use it for'
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] << UInt32(core.arguments[2])
+            }
+        ))
+
+        instructions.append(Instruction(
+            "SRL",
+            format: rsSubtype,
+            constants: ["opcode": 0x0, "funct": 0x02],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = core.registerFile[Int(core.arguments[1])] >> UInt32(core.arguments[2])
+            }
+        ))
+       
+        instructions.append(Instruction(
+            "SRA",
+            format: rsSubtype,
+            constants: ["opcode": 0x0, "funct": 0x03],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.registerFile[Int(core.arguments[0])] = UInt32(bitPattern: Int32(core.registerFile[Int(core.arguments[1])]) >> Int32(bitPattern: UInt32(core.arguments[2])))
+            }
+        ))
+
         //All-Const Subtype
         formats.append(
             Format(
@@ -295,14 +290,28 @@ extension InstructionSet
                 constants: ["const": 0xc],
                 executor:
                 {
-                    (rv32i: Core) in
-                    let core = rv32i as! RV32iCore
+                    (mips: Core) in
+                    let core = mips as! MIPSCore
                     core.state = .environmentCall
                     core.programCounter += 4
                     
                 }               
             )
         )
+
+        //Halt and Spontaneously Combust. Not actually a part of MIPS.
+        instructions.append(Instruction(
+            "HSC",
+            format: allConstSubtype,
+            constants: ["const": 0x7f820000],
+            executor:
+            {
+                (mips: Core) in
+                let core = mips as! MIPSCore
+                core.state = .error
+                throw CoreError.cpuCaughtFire
+            }
+        ))
         
         let abiNames = ["$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"]
 
@@ -326,7 +335,6 @@ extension InstructionSet
         ]
        
         return InstructionSet(bits: 32, formats: formats, instructions: instructions, abiNames: abiNames, keywords: keywords, directives: directives)
-
     }
     
     static let MIPS = Oak_gen_MIPS()
@@ -470,7 +478,7 @@ public class MIPSCore: Core
 
     public var pc: UInt
     {
-        return UInt(programCounter)
+        return UInt(programCounter &- 4)
     }
 
     public init?(memorySize: Int = 4096)

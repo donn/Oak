@@ -19,17 +19,9 @@ public enum AssemblyError: Error
     case unhandledOptional
 }
 
-public enum Behavior {
-    case zero
-    case ignore
-    case constant
-}
-
 public class BitRange
 {
     public var field: String
-    public var condition: ((UInt) -> (Bool))?
-    public var failBehavior: Behavior
     public var start: Int
     public var bits: Int
 
@@ -40,6 +32,9 @@ public class BitRange
     public var parameter: Int?
     public var parameterDefaultValue: UInt? //If the parameter is optional, it will default to this value
     public var parameterType: Parameter?
+
+    var constant: UInt?
+
     public var signExtended: Bool
 
     public var end: Int
@@ -47,11 +42,9 @@ public class BitRange
         return start + bits - 1
     }
   
-    public init(_ field: String, condition: ((UInt) -> (Bool))? = nil, onFailure failBehavior: Behavior = .zero, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, signExtended: Bool = true)
+    public init(_ field: String, at start: Int, bits: Int, totalBits: Int? = nil, limitStart: Int? = nil, limitEnd: Int? = nil, parameter: Int? = nil, parameterType: Parameter? = nil, parameterDefaultValue: UInt? = nil, constant: UInt? = nil, signExtended: Bool = true)
     {
         self.field = field
-        self.condition = condition
-        self.failBehavior = failBehavior
         self.start = start
         self.bits = bits
         self.totalBits = totalBits
@@ -60,6 +53,7 @@ public class BitRange
         self.parameter = parameter
         self.parameterType = parameterType
         self.parameterDefaultValue = parameterDefaultValue
+        self.constant = constant
         self.signExtended = signExtended
     }
 }
@@ -92,8 +86,6 @@ public class Instruction
     public var available: Bool
     public var execute: (Core) throws -> ()
 
-
-
     /*
      Bit Count
      
@@ -110,10 +102,7 @@ public class Instruction
         var count = 0
         for range in format.ranges
         {   
-            if range.condition == nil || range.failBehavior != .ignore || range.condition!(template) 
-            {
-                count += range.bits
-            }
+            count += range.bits
         }
 
         computedBits = count
@@ -175,11 +164,11 @@ public class Instruction
         }
         
         var code: UInt = 0
-        for range in self.format.ranges
+        for range in format.ranges
         {
-            if let constant = self.constants[range.field]
+            if let constant = range.constant ?? constants[range.field]
             {
-                code =  code | (constant << UInt(bitPattern: range.start))
+                code |= (constant << UInt(bitPattern: range.start))
             }
             
         }
@@ -313,16 +302,7 @@ public class InstructionSet
         {
             if let parameter = range.parameter
             {
-                if let condition = range.condition, !condition(instruction.template)
-                {
-                    continue
-                }
-                print("@arg\(parameter)")
-                print(abiNames[Int(bitPattern: arguments[parameter])])
-                print(arguments[parameter])
-                print(Int(bitPattern: arguments[parameter]))
                 output = output.replacingOccurrences(of: "@arg\(parameter)", with: (range.parameterType == .register) ? abiNames[Int(bitPattern: arguments[parameter])] : "\(Int(bitPattern: arguments[parameter]))")
-                print(output)
             }      
         }
         return output

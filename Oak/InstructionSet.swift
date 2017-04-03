@@ -130,7 +130,7 @@ public class Instruction
         }
         
         var string = ""
-        for i in 0..<bits
+        for _ in 0..<bits
         {
             string += "X"
         }
@@ -170,7 +170,6 @@ public class Instruction
             {
                 code |= (constant << UInt(bitPattern: range.start))
             }
-            
         }
         
         self.computedTemplate = code

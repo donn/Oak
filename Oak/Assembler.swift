@@ -34,6 +34,9 @@ public enum Directive
     //Fixed point decimals
     case fixedPoint
     case floatingPoint
+
+    //Custom
+    case custom
 }
 
 public class Assembler

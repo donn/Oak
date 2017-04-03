@@ -87,6 +87,7 @@ public class SimpleMemory: Memory
         {
             result.append(storage[address + i])
         }
+        
         return result
     }
 

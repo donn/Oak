@@ -9,7 +9,6 @@ extension InstructionSet
         //Formats and Instructions
         var formats: [Format] = []
         var instructions: [Instruction] = []
-        var pseudoInstructions: [PseudoInstruction] = []
        
         //R-Type
         formats.append(
@@ -293,7 +292,6 @@ extension InstructionSet
                     (mips: Core) in
                     let core = mips as! MIPSCore
                     core.state = .environmentCall
-                    core.programCounter += 4
                     
                 }               
             )
@@ -415,7 +413,7 @@ public class MIPSCore: Core
     {
         do
         {
-            var bytes = try self.memory.copy(UInt(programCounter), count: 4)
+            let bytes = try self.memory.copy(UInt(programCounter), count: 4)
             self.fetched = Utils.concatenate(bytes: bytes)
             programCounter += 4
         }

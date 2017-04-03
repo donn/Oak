@@ -82,10 +82,6 @@ signal(SIGINT)
             exit(9)
         }
     }
-    if s == 1
-    {
-        exit(9)
-    }
 }
 
 let command = Command(
@@ -105,7 +101,7 @@ let command = Command(
     (flags, arguments) in
     if flags.getBool(name: "version") ?? false
     {
-        print("Oak · Alpha 0.2")
+        print("Oak · Alpha 0.3")
         print("All rights reserved.")
         print("You should have obtained a copy of the Mozilla Public License with your app.")
         print("If you did not, a verbatim copy should be available at https://www.mozilla.org/en-US/MPL/2.0/.")
@@ -150,7 +146,7 @@ let command = Command(
         case "mips":
             coreChoice = MIPSCore()
         default:
-            //Not possible.
+            print("Unknown instruction set \(isaChoice).")
             return
     }
 
@@ -235,12 +231,14 @@ let command = Command(
             {
                 do
                 {
+                    try core.fetch()
+                    let disassembly = try core.decode()
                     if (interactive)
                     {
-                        var exit = false;
-                        while (!exit)
+                        var resume = false
+                        while (!resume)
                         {
-                            print("Program Counter: 0x\(Utils.pad(core.pc, digits: 8, radix: 16)) > ", terminator: "")
+                            print("Program Counter: 0x\(String(core.pc, radix: 16)) | \(disassembly) > ", terminator: "")
                             let input = readLine()
                             if (input == "r")
                             {
@@ -248,22 +246,20 @@ let command = Command(
                             }
                             else if (input == "c")
                             {
-                                exit = true
+                                resume = true
+                            }
+                            else if (input == nil)
+                            {
+                                print("")
+                                exit(9)
                             }
                         }
-                    }
-                    try core.fetch()
-                    let disassembly = try core.decode()
-                    if disassemble
-                    {
-                        print(core.pc, disassembly)
-                        //print((core as! RV32iCore).registerDump())
                     }
                     timer.counter += 1
 
                     if timer.counter == (1 << 14)
                     {
-                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 10) instructions and may be an infinite loop. You may want to interrupt the program.")
+                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
                     }
                     try core.execute()
                 }

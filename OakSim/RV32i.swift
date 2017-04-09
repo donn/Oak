@@ -8,7 +8,6 @@ extension InstructionSet
         //Formats and Instructions
         var formats: [Format] = []
         var instructions: [Instruction] = []
-        var pseudoInstructions: [PseudoInstruction] = []
        
         //R-Type
         formats.append(

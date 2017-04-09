@@ -4,6 +4,7 @@ public enum CoreError: Error
     case unavailableInstruction
     case unrecognizedInstruction
     case isaError
+    case cpuCaughtFire
     case unknownError
 }
 
@@ -54,8 +55,8 @@ extension Core
     mutating public func decode() throws -> String
     {
         self.decoded = nil
-        self.arguments = [UInt](repeating: 0, count: 16)
-        self.rawValues = [UInt](repeating: 0, count: 16)
+        self.arguments = [UInt](repeating: 0, count: 5)
+        self.rawValues = [UInt](repeating: 0, count: 5)
         self.fields = [:]
 
         guard let instruction = instructionSet.instruction(matching: self.fetched)
@@ -107,7 +108,7 @@ extension Core
                         print("\("Instruction Set Error:".blue.bold) Special parameter disassembler not found for field \(fields[parameter]!).")
                         throw CoreError.isaError
                     }
-                    value = disassembleSpecialParameter(rawValues[parameter]) //Unmangle...
+                    value = disassembleSpecialParameter(rawValues[parameter])
                 }
                 
                 arguments[parameter] = value

@@ -204,7 +204,7 @@ extension InstructionSet
                 (rv32i: Core) in
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = UInt32(core.programCounter) + 4
-                core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) + Int32(truncatingBitPattern: core.arguments[2]))
+                core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.registerFile[Int(core.arguments[1])]) &+ Int32(truncatingBitPattern: core.arguments[2]))
                 
             }
         ))
@@ -347,7 +347,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 do
                 {
-                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
+                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) &+ Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
                     core.registerFile[Int(core.arguments[0])] = UInt32(truncatingBitPattern: Utils.signExt(UInt(bytes[0]), bits: 8))
                     core.programCounter += 4    
                 }
@@ -369,7 +369,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 do
                 {
-                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
+                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) &+ Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4                    
                     
@@ -391,7 +391,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 do
                 {
-                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 4)
+                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) &+ Int32(truncatingBitPattern: core.arguments[1]))), count: 4)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4
                     
@@ -413,7 +413,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 do
                 {
-                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
+                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) &+ Int32(truncatingBitPattern: core.arguments[1]))), count: 1)
                     core.registerFile[Int(core.arguments[0])] = UInt32(bytes[0])
                     core.programCounter += 4
                     
@@ -436,7 +436,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 do
                 {
-                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) + Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
+                    let bytes = try core.memory.copy(UInt(bitPattern: Int(Int32(core.registerFile[Int(core.arguments[2])]) &+ Int32(truncatingBitPattern: core.arguments[1]))), count: 2)
                     core.registerFile[Int(core.arguments[0])] = UInt32(Utils.concatenate(bytes: bytes))
                     core.programCounter += 4
                     
@@ -550,7 +550,7 @@ extension InstructionSet
                 bytes.append(UInt8(core.registerFile[Int(core.arguments[0])] & 255))
                 do
                 {
-                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
+                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) &+ core.arguments[1], bytes: bytes)
                 }                
                 catch 
                 {
@@ -576,7 +576,7 @@ extension InstructionSet
                 bytes.append(UInt8(value & 255))
                 do
                 {
-                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
+                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) &+ core.arguments[1], bytes: bytes)
                 }
                 catch 
                 {
@@ -606,7 +606,7 @@ extension InstructionSet
                 bytes.append(UInt8(value & 255))
                 do
                 {
-                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) + core.arguments[1], bytes: bytes)
+                    try core.memory.set(UInt(core.registerFile[Int(core.arguments[2])]) &+ core.arguments[1], bytes: bytes)
                 }
                 catch 
                 {
@@ -784,7 +784,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 if core.registerFile[Int(core.arguments[0])] == core.registerFile[Int(core.arguments[1])]
                 {
-                    core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
+                    core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) &+ Int32(truncatingBitPattern: core.arguments[2]))
                     return
                 }
                 core.programCounter += 4
@@ -802,7 +802,7 @@ extension InstructionSet
                 let core = rv32i as! RV32iCore
                 if core.registerFile[Int(core.arguments[0])] != core.registerFile[Int(core.arguments[1])]
                 {
-                    core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[2]))
+                    core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) &+ Int32(truncatingBitPattern: core.arguments[2]))
                     return
                 }
                 core.programCounter += 4
@@ -993,7 +993,7 @@ extension InstructionSet
                 (rv32i: Core) in
                 let core = rv32i as! RV32iCore
                 core.registerFile[Int(core.arguments[0])] = core.programCounter + 4
-                core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) + Int32(truncatingBitPattern: core.arguments[1]))
+                core.programCounter = UInt32(bitPattern: Int32(bitPattern: core.programCounter) &+ Int32(truncatingBitPattern: core.arguments[1]))
                 
             }
         ))

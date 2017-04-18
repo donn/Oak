@@ -21,7 +21,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -184,7 +184,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -290,7 +290,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?[a-zA-Z0-9_]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -326,7 +326,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\s*\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\s*\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
                 disassembly: "@mnem @arg0, @arg1(@arg2)"
             )
         )
@@ -461,7 +461,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?0?[boxd]?[0-9A-F]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+),\\s*(-?0?[boxd]?[0-9A-F]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -527,7 +527,7 @@ extension InstructionSet
                     BitRange("imm", at: 7, bits: 5, totalBits: 12, limitStart: 0, limitEnd: 4, parameter: 1, parameterType: .immediate),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*(-?0?[boxd]?[0-9A-F]+)\\(\\s*([A-Za-z0-9]+)\\s*\\)")!,
                 disassembly: "@mnem @arg0, @arg1(@arg2)"
             )
         )
@@ -628,7 +628,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5, parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
                 disassembly: "@mnem @arg0, @arg1"
             )
         )
@@ -678,7 +678,7 @@ extension InstructionSet
                     BitRange("imm", at: 7, bits: 5, totalBits: 13, limitStart: 0, limitEnd: 4, parameter: 2, parameterType: .special),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
                 specialParameterProcessors: ["imm":
                 {
                     (text: String, address: UInt, bits: Int, labels: [String: UInt]) -> (errorMessage: String?, value: UInt) in
@@ -888,7 +888,7 @@ extension InstructionSet
                     BitRange("rd", at: 7, bits: 5,  parameter: 0, parameterType: .register),
                     BitRange("opcode", at: 0, bits: 7)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*([A-Za-z0-9]+)\\s*,\\s*([a-zA-Z0-9_]+)")!,
                 specialParameterProcessors: ["imm":
                 {
                     (text: String, address: UInt, bits: Int, labels: [String: UInt]) -> (errorMessage: String?, value: UInt) in
@@ -1005,7 +1005,7 @@ extension InstructionSet
                 ranges: [
                     BitRange("const", at: 0, bits: 32)
                 ],
-                regex: Regex("[a-zA-Z]+")!,
+                regex: Regex("([a-zA-Z]+)")!,
                 disassembly: "@mnem"
             )
         )

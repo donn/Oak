@@ -1,7 +1,7 @@
 ![Oak](Resources/logo.png)
 
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
-[![Swift Version 3.1](https://img.shields.io/badge/Swift-3.1--dev-orange.svg)](https://swift.org/download/#swift-31-development)
+[![Swift Version 3.1](https://img.shields.io/badge/Swift-3.1-orange.svg)](https://swift.org/download/#swift-31-development)
 [![License: MPL 2.0](https://img.shields.io/badge/license-MPL%202.0-orange.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
 The hackable, extensible, pure Swift instruction set simulator for Unix (assembly included).

@@ -22,7 +22,7 @@ extension InstructionSet
                     BitRange("rt", at: 16, bits: 5, parameter: 2, parameterType: .register),
                     BitRange("shamt", at: 6, bits: 5, constant: 0)
                 ],
-                regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -219,7 +219,7 @@ extension InstructionSet
                     BitRange("funct", at: 0, bits: 6)
 
                 ],
-                regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
+                regex: Regex("([a-zA-Z]+)\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$?[A-Za-z0-9]+)")!,
                 disassembly: "@mnem @arg0, @arg1, @arg2"
             )
         )
@@ -233,7 +233,7 @@ extension InstructionSet
         instructions.append(Instruction(
             "SLL",
             format: rsSubtype,
-            constants: ["opcode": 0x0, "funct": 0x00], //This means that 0x00000000 is actually an instruction in MIPS32, so I can't use it for'
+            constants: ["opcode": 0x0, "funct": 0x00], //This means that 0x00000000 is actually an instruction in MIPS32, so I can't use it for halting or anything...
             executor:
             {
                 (mips: Core) in
@@ -272,7 +272,7 @@ extension InstructionSet
                 ranges: [
                     BitRange("const", at: 0, bits: 32)
                 ],
-                regex: Regex("[a-zA-Z]+")!,
+                regex: Regex("([a-zA-Z]+)")!,
                 disassembly: "@mnem"
             )
         )
@@ -311,6 +311,29 @@ extension InstructionSet
             }
         ))
         
+        //I-Type
+        formats.append(
+            Format(
+                ranges:
+                [
+                    BitRange("opcode", at: 26, bits: 6),
+                    BitRange("rs", at: 21, bits: 5, parameter: 1, parameterType: .register),
+                    BitRange("rt", at: 16, bits: 5, parameter: 0, parameterType: .register),
+                    BitRange("imm", at: 0, bits: 16, parameter: 2, parameterType: .immediate)
+                ],
+                regex: Regex("[a-zA-Z]+\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(\\$[A-Za-z0-9]+)\\s*,\\s*(-?[a-zA-Z0-9_]+)/")!,
+                disassembly: "@mnem @arg0, @arg1, @arg2"
+            )
+        )
+
+        guard let iType = formats.last
+        else
+        {
+            return nil
+        }
+        
+        //TO-DO: Finish MIPS.
+
         let abiNames = ["$zero", "$at", "$v0", "$v1", "$a0", "$a1", "$a2", "$a3", "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7", "$t8", "$t9", "$k0", "$k1", "$gp", "$sp", "$fp", "$ra"]
 
         let keywords: [Keyword: [String]] = [
@@ -461,7 +484,7 @@ public class MIPSCore: Core
 
     public var service: [UInt]
     {
-        return [UInt(registerFile[17]), UInt(registerFile[10]), UInt(registerFile[11]), UInt(registerFile[12]), UInt(registerFile[13]), UInt(registerFile[14]), UInt(registerFile[15]), UInt(registerFile[16])]
+        return [UInt(registerFile[2]), UInt(registerFile[4]), UInt(registerFile[5]), UInt(registerFile[6]), UInt(registerFile[7])]
     }
 
     public var registers: [(abiName: String, value: UInt)]

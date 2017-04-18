@@ -101,7 +101,7 @@ let command = Command(
     (flags, arguments) in
     if flags.getBool(name: "version") ?? false
     {
-        print("Oak · Alpha 0.3")
+        print("Oak · Alpha 0.4")
         print("All rights reserved.")
         print("You should have obtained a copy of the Mozilla Public License with your app.")
         print("If you did not, a verbatim copy should be available at https://www.mozilla.org/en-US/MPL/2.0/.")
@@ -141,9 +141,10 @@ let command = Command(
         case "rv32i":
             coreChoice = RV32iCore()
         case "armv7":
-            print("ARMv7 not yet implemented.")
+            print("\("Oak Error".red.bold): ARMv7 not yet implemented.")
             exit(64)
         case "mips":
+            print("\("Oak Warning".yellow.bold): MIPS is unfinished. Only R-Types are supported.")
             coreChoice = MIPSCore()
         default:
             print("Unknown instruction set \(isaChoice).")
@@ -254,6 +255,10 @@ let command = Command(
                                 exit(9)
                             }
                         }
+                    }
+                    else if (disassemble)
+                    {
+                        print(disassembly)
                     }
                     timer.counter += 1
 

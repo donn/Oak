@@ -558,6 +558,7 @@ public class Assembler
                         continue
                     }
                     captures.removeFirst()
+                    captures.removeFirst()
                     
                     for (j, range) in bitRanges.enumerated()
                     {
@@ -887,7 +888,7 @@ public class Assembler
             options += keyword
         }
 
-        return options + ")";
+        return options + ")"
     }
 
     /*

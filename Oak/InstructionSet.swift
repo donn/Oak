@@ -283,12 +283,15 @@ public class InstructionSet
     {
         for instruction in instructions
         {
-            if line.uppercased().hasPrefix(instruction.mnemonic)
+            if line.uppercased().hasPrefix(instruction.mnemonic) 
             {
-                return instruction
+                if instruction.format.regex.captures(in: line)?[1].uppercased() == instruction.mnemonic
+                {
+                    return instruction
+                }
             }
         }
-        
+
         return nil
     }
     

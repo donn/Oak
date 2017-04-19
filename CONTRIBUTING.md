@@ -12,7 +12,7 @@ Here are the most important things Oak needs at the moment:
 Here are things that while would be nice, are less of a priority:
 * Access Control. It is unclear what should be public and what should be private, and which belongs in what module.
 * Error Handling. For simulation (and only simulation), Oak should use Swift's error handling. It would be nice to have all the force unwraps gone too, but that will take a while.
-* Increasing the IPS count. While Assembly is swift enough, on a release build of Oak only gets about ~4 KIPS on my 2GHz machine. Now Oak is not aiming to rival qemu, gem5 or anything speed-wise (Oak's main focus is absolute simplicity), but this is still rather low.
+* Increasing the IPS count. While Assembly is swift enough, on a release build of Oak only gets about ~5 KIPS on my 2.6GHz machine. Now Oak is not aiming to rival qemu, gem5 or anything speed-wise (Oak's main focus is absolute simplicity), but this is still rather low.
 * * Cacheing decodes would be a good start as apps are by definition loopy, but faster decodes are paramount.
 * ARM. Oak was initially designed to support ARM, and while college projects have sidetracked that development, until RISC-V becomes stable, the most popular platform would likely continue to be ARM.
-* Proper memory map (for RISCV). Oak currently implements an amorphous structure, where data and text are intertwined. Oak does not aim to do anything "magical" and having Oak automatically add instructions to skip data may cause some complexity.
+* Proper memory map (for RISCV). Oak currently implements an amorphous structure, where data and text are intertwined. Oak does not aim to do anything "magical" and having Oak automatically add instructions to skip data may introduce some complexity.

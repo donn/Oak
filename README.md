@@ -1,3 +1,5 @@
+## Note: Oak is no longer under active development. If you would like to continue using Oak, you may fork this project or try [Oak.js](https://github.com/skyus/Oak.js).
+
 ![Oak](Resources/logo.png)
 
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://github.com/apple/swift-package-manager)
@@ -6,9 +8,7 @@
 
 The hackable, extensible, pure Swift instruction set simulator for Unix (assembly included).
 
-The ultimate aim for this project is to have a terminal and later GUI app to practice and create various instruction set architectures that is easy to both use *and* modify.
-
-While designed for ARM initially, as one of [Oak.js](https://github.com/skyus/Oak.js) requirements was RISC-V, Oak's backport currently supports RISC-V, but ARM should be coming soon enough.
+Supports a limited subset of MIPS and RISC-V.
 
 # Requirements
 Swift 3.1 on either macOS or Linux.

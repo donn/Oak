@@ -11,6 +11,7 @@ build/
 DerivedData/
 Packages/
 Package.pins
+Package.resolved
 **/*.bin
 
 ## Runtime

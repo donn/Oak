@@ -105,7 +105,7 @@ extension Core
                     else
                     {
                         state = .error
-                        print("\("Instruction Set Error:".blue.bold) Special parameter disassembler not found for field \(fields[parameter]!).")
+                        print("\("Instruction Set Error:") Special parameter disassembler not found for field \(fields[parameter]!).")
                         throw CoreError.isaError
                     }
                     value = disassembleSpecialParameter(rawValues[parameter])

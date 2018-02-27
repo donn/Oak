@@ -11,7 +11,7 @@ The hackable, extensible, pure Swift instruction set simulator for Unix (assembl
 Supports a limited subset of MIPS and RISC-V.
 
 # Requirements
-Swift 3.1 on either macOS or Linux.
+Swift 3.1 or Swift 4.0 on either macOS or Linux.
 
 # Usage
 ## Unix

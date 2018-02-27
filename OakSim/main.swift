@@ -1,7 +1,6 @@
 import Foundation
 import Oak
 import Guaka
-import Colors
 
 extension Array
 {
@@ -141,10 +140,10 @@ let command = Command(
         case "rv32i":
             coreChoice = RV32iCore()
         case "armv7":
-            print("\("Oak Error".red.bold): ARMv7 not yet implemented.")
+            print("\("Oak Error"): ARMv7 not yet implemented.")
             exit(64)
         case "mips":
-            print("\("Oak Warning".yellow.bold): MIPS is unfinished. Only R-Types are supported.")
+            print("\("Oak Warning"): MIPS is unfinished. Only R-Types are supported.")
             coreChoice = MIPSCore()
         default:
             print("Unknown instruction set \(isaChoice).")
@@ -264,7 +263,7 @@ let command = Command(
 
                     if timer.counter == (1 << 14)
                     {
-                        print("\("Oak Warning".green.bold): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
+                        print("\("Oak Warning"): This program has taken over \(1 << 14) instructions and may be an infinite loop. You may want to interrupt the program.")
                     }
                     try core.execute()
                 }
@@ -306,7 +305,7 @@ let command = Command(
                         timer.print()
                         return
                     default:
-                        print("\("Warning".yellow.bold): Ignored unknown environment call service number \(core.service[0]).")
+                        print("\("Warning"): Ignored unknown environment call service number \(core.service[0]).")
                 }
                 core.state = .running
                 timer.resume()

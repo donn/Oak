@@ -1,5 +1,4 @@
 import Foundation
-import Colors
 
 public enum Keyword
 {
@@ -314,20 +313,20 @@ public class Assembler
                             text = false
                             if (words.count > 1)
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
                         case .text:
                             if (words.count > 1)
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
                         default:
                             //TODO - Allow user-defined directives
-                            let message = "\("Assembler Error:".red.bold) Line \(i): This directive is unsupported in the text section."
+                            let message = "\("Assembler Error:") Line \(i): This directive is unsupported in the text section."
                             errorMessages.append(message)
                             continue
                     }
@@ -337,7 +336,7 @@ public class Assembler
                     guard let instruction = instructionSet.instruction(prefixing: lineMutable)
                     else
                     {
-                        let message = "\("Assembler Error:".red.bold) Line \(i): Instruction \(words[0]) not found."
+                        let message = "\("Assembler Error:") Line \(i): Instruction \(words[0]) not found."
                         errorMessages.append(message)
                         continue
                     }
@@ -354,7 +353,7 @@ public class Assembler
                         case .data:
                             if (words.count > 1)
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -362,7 +361,7 @@ public class Assembler
                             text = true
                             if (words.count > 1)
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -373,7 +372,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
+                                let message = "\("Assembler Error:") Line \(i): Malformed string."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -391,7 +390,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No 8-bit values found."
+                                let message = "\("Assembler Error:") Line \(i): No 8-bit values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -400,7 +399,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No 16-bit values found."
+                                let message = "\("Assembler Error:") Line \(i): No 16-bit values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -409,7 +408,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No 32-bit values found."
+                                let message = "\("Assembler Error:") Line \(i): No 32-bit values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -418,35 +417,35 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No 64-bit values found."
+                                let message = "\("Assembler Error:") Line \(i): No 64-bit values found."
                                 errorMessages.append(message)
                                 continue
                             }
                             address +=  UInt(matches.count << 3)
                         //Fixed point decimals
                         case .fixedPoint:
-                            let message = "\("Oak Error:".blue.bold) Line \(i): Fixed point decimals not yet supported."
+                            let message = "\("Oak Error:") Line \(i): Fixed point decimals not yet supported."
                             errorMessages = [message]
                             return (errorMessages, labels, lines)
                         case .floatingPoint:
                             guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No floating point values found."
+                                let message = "\("Assembler Error:") Line \(i): No floating point values found."
                                 errorMessages.append(message)
                                 continue
                             }
                             guard let width = instructionSet.floatingPointLengths[str]
                             else
                             {
-                                let message = "\("Instruction Set Error:".blue.bold) Line \(i): Floating point directive \(str) has a missing octet length."
+                                let message = "\("Instruction Set Error:") Line \(i): Floating point directive \(str) has a missing octet length."
                                 errorMessages = [message]
                                 return (errorMessages, labels, lines)
                             }
                             address +=  UInt(matches.count * width)
                         default:
                             //TODO - Allow user-defined directives
-                            let message = "\("Assembler Error:".red.bold) Line \(i): This directive is unsupported in the data section."
+                            let message = "\("Assembler Error:") Line \(i): This directive is unsupported in the data section."
                             errorMessages.append(message)
                             continue
                     }
@@ -455,12 +454,12 @@ public class Assembler
                 {
                     if let _ = instructionSet.instruction(prefixing: lineMutable)
                     {
-                        let message = "\("Assembler Error:".red.bold) Line \(i): Instruction \(words[0]) is in the data section."
+                        let message = "\("Assembler Error:") Line \(i): Instruction \(words[0]) is in the data section."
                         errorMessages.append(message)
                         continue
                     }
 
-                    let message = "\("Assembler Error:".red.bold) Line \(i): Unrecognized keyword \(words[0])."
+                    let message = "\("Assembler Error:") Line \(i): Unrecognized keyword \(words[0])."
                     errorMessages.append(message)
                     continue
                 }
@@ -512,20 +511,20 @@ public class Assembler
                             text = false
                             if words.count > 1
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
                         case .text:
                             if words.count > 1
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
                         default:
                             //TODO - Allow user-defined directives
-                            let message = "\("Assembler Error:".red.bold) Line \(i): This directive is unsupported in the text section."
+                            let message = "\("Assembler Error:") Line \(i): This directive is unsupported in the text section."
                             errorMessages.append(message)
                             continue
                     }
@@ -535,7 +534,7 @@ public class Assembler
                     guard let instruction = self.instructionSet.instruction(prefixing: line)
                     else
                     {
-                        let message = "\("Assembler Error:".red.bold) Line \(i): Instruction \(words[0]) not found."
+                        let message = "\("Assembler Error:") Line \(i): Instruction \(words[0]) not found."
                         errorMessages.append(message)
                         continue
                     }
@@ -553,7 +552,7 @@ public class Assembler
                     guard var captures = regex.captures(in: line)
                     else
                     {
-                        let message = "\("Assembler Error:".red.bold) Line \(i): Argument format for \(words[0]) violated."
+                        let message = "\("Assembler Error:") Line \(i): Argument format for \(words[0]) violated."
                         errorMessages.append(message)
                         continue
                     }
@@ -579,7 +578,7 @@ public class Assembler
                             //     guard let defaultValue = range.parameterDefaultValue
                             //     else
                             //     {
-                            //         let message = "\("Instruction Set Error:".blue.bold) Line \(i): Parameter '\(field)' is conditional, missing default value."
+                            //         let message = "\("Instruction Set Error:") Line \(i): Parameter '\(field)' is conditional, missing default value."
                             //         errorMessages = [message]
                             //         return (errorMessages, machineCode)
                             //     }
@@ -591,14 +590,14 @@ public class Assembler
                                 guard let specialProcess = instruction.format.processSpecialParameter[field]
                                 else
                                 {
-                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Special parameter '\(field)' missing parameter processor."
+                                    let message = "\("Instruction Set Error:") Line \(i): Special parameter '\(field)' missing parameter processor."
                                     errorMessages = [message]
                                     return (errorMessages, machineCode)
                                 }
                                 let processed = specialProcess(captures[parameter], address, bits, labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
+                                    let message = "\("Assembler Error:") Line \(i): \(error)"
                                     errorMessages.append(message)
                                     skipLine = true
                                     continue
@@ -610,14 +609,14 @@ public class Assembler
                                 guard let type = range.parameterType
                                 else
                                 {
-                                    let message = "\("Instruction Set Error:".blue.bold) Line \(i): Parameter '\(field)' missing parameter type."
+                                    let message = "\("Instruction Set Error:") Line \(i): Parameter '\(field)' missing parameter type."
                                     errorMessages = [message]
                                     return (errorMessages, machineCode)
                                 }
                                 let processed = process(captures[parameter], address: address, type: type, bits: bits, labels: labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): \(error)"
+                                    let message = "\("Assembler Error:") Line \(i): \(error)"
                                     errorMessages.append(message)
                                     skipLine = true
                                     continue
@@ -667,7 +666,7 @@ public class Assembler
                         case .data:
                             if words.count > 1
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -675,7 +674,7 @@ public class Assembler
                             text = true
                             if words.count > 1
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): This directive does not take any parameters."
+                                let message = "\("Assembler Error:") Line \(i): This directive does not take any parameters."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -686,7 +685,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.string], let captures = Regex(regex)!.captures(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): Malformed string."
+                                let message = "\("Assembler Error:") Line \(i): Malformed string."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -730,7 +729,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
+                                let message = "\("Assembler Error:") Line \(i): No values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -739,7 +738,7 @@ public class Assembler
                                 let processed = process(match, address: address, type: .immediate, bits: 8, labels: labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): Value \(j): \(error)."
+                                    let message = "\("Assembler Error:") Line \(i): Value \(j): \(error)."
                                     errorMessages.append(message)
                                     continue
                                 }
@@ -750,7 +749,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
+                                let message = "\("Assembler Error:") Line \(i): No values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -759,7 +758,7 @@ public class Assembler
                                 let processed = process(match, address: address, type: .immediate, bits: 16, labels: labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): Value \(j): \(error)."
+                                    let message = "\("Assembler Error:") Line \(i): Value \(j): \(error)."
                                     errorMessages.append(message)
                                     continue
                                 }
@@ -771,7 +770,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No 32-bit values found."
+                                let message = "\("Assembler Error:") Line \(i): No 32-bit values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -780,7 +779,7 @@ public class Assembler
                                 let processed = process(match, address: address, type: .immediate, bits: 32, labels: labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): Value \(j): \(error)."
+                                    let message = "\("Assembler Error:") Line \(i): Value \(j): \(error)."
                                     errorMessages.append(message)
                                     continue
                                 }
@@ -794,7 +793,7 @@ public class Assembler
                             guard let regex = keywordRegexes[.data], let matches = Regex(regex)!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No values found."
+                                let message = "\("Assembler Error:") Line \(i): No values found."
                                 errorMessages.append(message)
                                 continue
                             }
@@ -803,7 +802,7 @@ public class Assembler
                                 let processed = process(match, address: address, type: .immediate, bits: 64, labels: labels)
                                 if let error = processed.errorMessage
                                 {
-                                    let message = "\("Assembler Error:".red.bold) Line \(i): Value \(j): \(error)."
+                                    let message = "\("Assembler Error:") Line \(i): Value \(j): \(error)."
                                     errorMessages.append(message)
                                     continue
                                 }
@@ -819,41 +818,41 @@ public class Assembler
                             address +=  UInt(matches.count << 3)
                         //Fixed point decimals
                         case .fixedPoint:
-                            let message = "\("Oak Error:".blue.bold) Line \(i): Fixed point decimals not yet supported."
+                            let message = "\("Oak Error:") Line \(i): Fixed point decimals not yet supported."
                             errorMessages = [message]
                             return (errorMessages, machineCode)
                         case .floatingPoint:
                             guard let matches = Regex("[-+]?[0-9]*\\.?[0-9]+")!.matches(in: directiveData!)
                             else
                             {
-                                let message = "\("Assembler Error:".red.bold) Line \(i): No floating point values found."
+                                let message = "\("Assembler Error:") Line \(i): No floating point values found."
                                 errorMessages.append(message)
                                 continue
                             }
                             guard let width = instructionSet.floatingPointLengths[str]
                             else
                             {
-                                let message = "\("Instruction Set Error:".blue.bold) Line \(i): Floating point directive \(str) has a missing octet length.\nConsider submitting a bug report."
+                                let message = "\("Instruction Set Error:") Line \(i): Floating point directive \(str) has a missing octet length.\nConsider submitting a bug report."
                                 errorMessages = [message]
                                 return (errorMessages, machineCode)
                             }
                             for (j, match) in matches.enumerated()
                             {
-                                let message = "\("Oak Error:".blue.bold) Line \(i): Floating point decimal support is not yet finished."
+                                let message = "\("Oak Error:") Line \(i): Floating point decimal support is not yet finished."
                                 errorMessages = [message]
                                 return (errorMessages, machineCode)
                             }
                             address +=  UInt(matches.count * width)
                         default:
                             //TODO - Allow user-defined directives
-                            let message = "\("Assembler Error:".red.bold) Line \(i): This directive is unsupported in the data section."
+                            let message = "\("Assembler Error:") Line \(i): This directive is unsupported in the data section."
                             errorMessages.append(message)
                             continue
                     }
                 }
                 else
                 {
-                    let message = "\("Assembler Error:".red.bold) Line \(i): Only directives are accepted in the data section."
+                    let message = "\("Assembler Error:") Line \(i): Only directives are accepted in the data section."
                     errorMessages.append(message)
                     continue
                 }
@@ -875,7 +874,7 @@ public class Assembler
         {
             if keyword == "\\"
             {
-                print("\("Instruction Set Error:".blue.bold) Escape character \\ cannot be used as a keyword.")
+                print("\("Instruction Set Error:") Escape character \\ cannot be used as a keyword.")
             }
             if options.isEmpty
             {
@@ -966,7 +965,7 @@ public class Assembler
                     {
                         if let options1 = Assembler.options(from: list1)
                         {
-                            print("\("Oak Warning:".yellow.bold) Oak does not support block comments just yet, so please do not use them in your code.")
+                            print("\("Oak Warning:") Oak does not support block comments just yet, so please do not use them in your code.")
                         }
                     }
                 }
@@ -975,7 +974,7 @@ public class Assembler
         else
         {
             self.keywordRegexes = [:]
-            print("\("Instruction Set Warning:".yellow.bold) This instruction set doesn't define any keywords.\nTo suppress this warning, pass an empty [:] to \"keywords\".")
+            print("\("Instruction Set Warning:") This instruction set doesn't define any keywords.\nTo suppress this warning, pass an empty [:] to \"keywords\".")
         }
         self.directives = instructionSet.directives
         self.endianness = endianness ?? instructionSet.endianness
